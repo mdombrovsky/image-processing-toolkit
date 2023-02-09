@@ -6,49 +6,59 @@ class Pixel {
     green: number;
     blue: number;
     alpha: number;
-    constructor(red: number, green: number, blue: number, alpha: number) {
+    disabled: boolean;
+    constructor(red: number, green: number, blue: number, alpha: number, disabled: boolean = false) {
         this.red = red
         this.green = green
         this.blue = blue
         this.alpha = alpha
+        this.disabled = false
     }
+}
+
+
+function getPixelImageFromImageData(imageData: ImageData): PixelImage {
+    const tempPixels: Pixel[][] = []
+
+    const data = imageData.data
+    for (let i = 0; i < data.length; i += 4) {
+        const pixel = new Pixel(data[i], data[i + 1], data[i + 2], data[i + 3]);
+        const row = Math.floor(i / 4 / imageData.width);
+        if (!tempPixels[row]) {
+            tempPixels[row] = [];
+        }
+        tempPixels[row].push(pixel);
+    }
+
+    return new PixelImage(tempPixels, tempPixels[0].length, tempPixels.length)
 }
 
 class PixelImage {
     pixels: Pixel[][]
-    imageData: ImageData
-    constructor(imageData: ImageData) {
-        this.imageData = imageData
-        this.pixels = this.getPixels()
-    }
-    private getPixels(): Pixel[][] {
-        const tempPixels: Pixel[][] = []
+    width: number
+    height: number
 
-        const data = this.imageData.data
-        for (let i = 0; i < data.length; i += 4) {
-            const pixel = new Pixel(data[i], data[i + 1], data[i + 2], data[i + 3]);
-            const row = Math.floor(i / 4 / this.imageData.width);
-            if (!tempPixels[row]) {
-                tempPixels[row] = [];
-            }
-            tempPixels[row].push(pixel);
-        }
 
-        return tempPixels
+    constructor(pixels: Pixel[][], width: number, height: number) {
+        this.pixels = pixels
+        this.width = width
+        this.height = height
     }
 
-    recalculateImageData(): ImageData {
-        const data = this.imageData.data;
 
-        for (let i = 0; i < data.length; i += 4) {
-            const row = Math.floor(i / 4 / this.imageData.width);
-            const col = (i / 4) % this.imageData.width;
-            data[i] = this.pixels[row][col].red;
-            data[i + 1] = this.pixels[row][col].green;
-            data[i + 2] = this.pixels[row][col].blue;
-            data[i + 3] = this.pixels[row][col].alpha;
+    createImageData(): ImageData {
+        const data = new Uint8ClampedArray(this.width * this.height * 4);
+
+        let index = 0;
+        for (const pixel of this.pixels.flat()) {
+            data[index++] = pixel.red;
+            data[index++] = pixel.green;
+            data[index++] = pixel.blue;
+            data[index++] = pixel.alpha;
         }
-        return this.imageData
+
+        const imageData = new ImageData(data, this.width, this.height);
+        return imageData
     }
 }
 
@@ -90,9 +100,15 @@ function flipVertically(pixelImage: PixelImage) {
     }
 }
 
+function rotate(pixelImage: PixelImage, degrees: number = 3) {
+    const pixels = pixelImage.pixels
+    alert("not implemented yet, degrees: " + degrees)
+}
+
 const ModifyImage: React.FC = () => {
     const [image, setImage] = useState(bars);
     const imageRef = useRef<HTMLImageElement>(null);
+    const [rotateAmount, setRotateAmount] = useState(45);
 
     /**
      *  Javascript requires a lot of handling to get at the individual pixels
@@ -111,12 +127,12 @@ const ModifyImage: React.FC = () => {
 
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-                const pixelImage = new PixelImage(imageData)
+                const pixelImage = getPixelImageFromImageData(imageData)
 
                 modifyFunction(pixelImage)
-                pixelImage.recalculateImageData()
 
-                ctx.putImageData(imageData, 0, 0);
+
+                ctx.putImageData(pixelImage.createImageData(), 0, 0);
                 setImage(canvas.toDataURL());
             }
         }
@@ -128,6 +144,8 @@ const ModifyImage: React.FC = () => {
             <button onClick={() => modifyImage(invertPixels)}>Invert Pixels</button>
             <button onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</button>
             <button onClick={() => modifyImage(flipVertically)}>Flip vertically</button>
+            <input type='number' defaultValue={45} onChange={e => setRotateAmount(parseInt(e.target.value, 10) || 0)} />
+            <button onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount))}>rotate</button>
         </div>
     );
 };
