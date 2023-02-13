@@ -1,20 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef } from "react";
-
-class Pixel {
-    red: number;
-    green: number;
-    blue: number;
-    alpha: number;
-    disabled: boolean;
-    constructor(red: number, green: number, blue: number, alpha: number, disabled: boolean = false) {
-        this.red = red
-        this.green = green
-        this.blue = blue
-        this.alpha = alpha
-        this.disabled = false
-    }
-}
+import { crop, flipHorizontally, flipVertically, invertPixels, Pixel, PixelImage, rotate } from './PixelOperations'
 
 
 function getPixelImageFromImageData(imageData: ImageData): PixelImage {
@@ -50,96 +36,6 @@ function getImageCanvasFromPixelImage(pixelImage: PixelImage): HTMLCanvasElement
     return modifiedCanvas
 }
 
-class PixelImage {
-    pixels: Pixel[][]
-    width: number
-    height: number
-    angle: number = 0
-
-
-    constructor(pixels: Pixel[][], width: number, height: number) {
-        this.pixels = pixels
-        this.width = width
-        this.height = height
-    }
-
-    overwrite(pixels: Pixel[][], width: number, height: number) {
-        this.pixels = pixels
-        this.width = width
-        this.height = height
-    }
-}
-
-
-function invertPixels(pixelImage: PixelImage): PixelImage {
-    const pixels = pixelImage.pixels
-    for (var i = 0; i < pixels.length; i++) {
-        for (var j = 0; j < pixels[0].length; j++) {
-            pixels[i][j].red = 255 - pixels[i][j].red
-            pixels[i][j].green = 255 - pixels[i][j].green
-            pixels[i][j].blue = 255 - pixels[i][j].blue
-        }
-    }
-    return pixelImage
-}
-
-function flipHorizontally(pixelImage: PixelImage) {
-    const pixels = pixelImage.pixels
-    for (var i = 0; i < pixels.length; i++) {
-        for (var j = 0; j < Math.floor(pixels[0].length / 2); j++) {
-            const corresponding_j = pixels[0].length - 1 - j
-            const temp = pixels[i][j]
-            pixels[i][j] = pixels[i][corresponding_j]
-            pixels[i][corresponding_j] = temp
-
-        }
-    }
-}
-
-function flipVertically(pixelImage: PixelImage) {
-    const pixels = pixelImage.pixels
-    for (var i = 0; i < Math.floor(pixels.length / 2); i++) {
-        for (var j = 0; j < pixels[0].length; j++) {
-            const corresponding_i = pixels.length - 1 - i
-            const temp = pixels[i][j]
-            pixels[i][j] = pixels[corresponding_i][j]
-            pixels[corresponding_i][j] = temp
-        }
-    }
-}
-
-function changeSize(pixelImage: PixelImage) {
-    const modifiedCanvas = document.createElement('canvas');
-    modifiedCanvas.width = pixelImage.pixels[0].length;
-    modifiedCanvas.height = pixelImage.pixels.length;
-    const modifiedContext = modifiedCanvas.getContext('2d')!;
-    const modifiedImageData = modifiedContext.createImageData(modifiedCanvas.width, modifiedCanvas.height);
-    for (let i = 0; i < pixelImage.pixels.length; i++) {
-        for (let j = 0; j < pixelImage.pixels[0].length; j++) {
-            const pixelData = pixelImage.pixels[i][j];
-            const index = (i * modifiedCanvas.width + j) * 4;
-            modifiedImageData.data[index] = pixelData.red;
-            modifiedImageData.data[index + 1] = pixelData.green;
-            modifiedImageData.data[index + 2] = pixelData.blue;
-            modifiedImageData.data[index + 3] = pixelData.alpha;
-        }
-    }
-    modifiedContext.putImageData(modifiedImageData, 0, 0);
-}
-
-function rotate(pixelImage: PixelImage, degrees: number = 3) {
-    const pixels = pixelImage.pixels
-    alert("not implemented yet, degrees: " + degrees)
-}
-
-
-function crop(pixelImage: PixelImage, pixelsFromTop: number) {
-    const newPixels = pixelImage.pixels.slice(pixelsFromTop);
-
-    pixelImage.overwrite(newPixels,
-        newPixels[0].length,
-        newPixels.length);
-}
 
 const ModifyImage: React.FC = () => {
     const [image, setImage] = useState(bars);
