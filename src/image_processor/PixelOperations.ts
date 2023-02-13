@@ -1,5 +1,3 @@
-import React, { useState, useRef } from "react";
-
 export class Pixel {
     red: number;
     green: number;
@@ -78,10 +76,16 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3) {
 }
 
 
-export function crop(pixelImage: PixelImage, pixelsFromTop: number) {
-    const newPixels = pixelImage.pixels.slice(pixelsFromTop);
+export function crop(pixelImage: PixelImage, pixelsFromTop: number, pixelsFromBottom: number, pixelsFromLeft: number, pixelsFromRight: number) {
+    pixelsFromTop = Math.max(0, pixelsFromTop)
+    pixelsFromBottom = Math.max(0, pixelsFromBottom)
+    pixelsFromLeft = Math.max(0, pixelsFromLeft)
+    pixelsFromRight = Math.max(0, pixelsFromRight)
 
-    pixelImage.overwrite(newPixels,
-        newPixels[0].length,
-        newPixels.length);
+    pixelImage.pixels.splice(0, pixelsFromTop)
+    pixelImage.pixels.splice(pixelImage.pixels.length - pixelsFromBottom, pixelsFromBottom)
+    for (let i = 0; i < pixelImage.pixels.length; i++) {
+        pixelImage.pixels[i].splice(0, pixelsFromLeft);
+        pixelImage.pixels[i].splice(pixelImage.pixels[i].length - pixelsFromRight, pixelsFromRight)
+    }
 }

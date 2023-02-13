@@ -1,5 +1,5 @@
 import bars from '../images/bars_test_image.png'
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { crop, flipHorizontally, flipVertically, invertPixels, Pixel, PixelImage, rotate } from './PixelOperations'
 
 
@@ -37,10 +37,28 @@ function getImageCanvasFromPixelImage(pixelImage: PixelImage): HTMLCanvasElement
 }
 
 
+
 const ModifyImage: React.FC = () => {
-    const [image, setImage] = useState(bars);
+    const defaultImage = bars
+    const [image, setImage] = useState(defaultImage);
     const imageRef = useRef<HTMLImageElement>(null);
+    const [width, setWidth] = useState(0);
+    const [height, setHeight] = useState(0);
     const [rotateAmount, setRotateAmount] = useState(45);
+    const [top, setTop] = useState(0);
+    const [bottom, setBottom] = useState(0);
+    const [left, setLeft] = useState(0);
+    const [right, setRight] = useState(0);
+
+
+    useEffect(() => {
+        const image_ = new Image();
+        image_.src = image;
+        image_.onload = () => {
+            setWidth(image_.width);
+            setHeight(image_.height);
+        };
+    }, [image]);
 
     /**
      *  Javascript requires a lot of handling to get at the individual pixels
@@ -71,14 +89,34 @@ const ModifyImage: React.FC = () => {
     return (
         <div>
             <img ref={imageRef} src={image} alt="Image" />
+            <text>
+                <br />
+                Height: {height} <br />
+                Width: {width} <br />
+            </text>
             <button onClick={() => setImage(bars)}>Reset</button>
             <button onClick={() => modifyImage(invertPixels)}>Invert Pixels</button>
             <button onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</button>
             <button onClick={() => modifyImage(flipVertically)}>Flip vertically</button>
             <input type='number' defaultValue={45} onChange={e => setRotateAmount(parseInt(e.target.value, 10) || 0)} />
             <button onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount))}>rotate</button>
-            <button onClick={() => modifyImage((pixels: PixelImage) => crop(pixels, 10))}>crop</button>
-
+            <div>
+                <label htmlFor="topInput">Top:</label>
+                <input type="number" id="topInput" name="top crop" min={0} defaultValue={0} onChange={e => setTop(Number(e.target.value))} />
+            </div>
+            <div>
+                <label htmlFor="bottomInput">Bottom:</label>
+                <input type="number" id="bottomInput" name="bottom crop" min={0} defaultValue={0} onChange={e => setBottom(Number(e.target.value))} />
+            </div>
+            <div>
+                <label htmlFor="leftInput">Left:</label>
+                <input type="number" id="leftInput" name="left crop" min={0} defaultValue={0} onChange={e => setLeft(Number(e.target.value))} />
+            </div>
+            <div>
+                <label htmlFor="rightInput">Right:</label>
+                <input type="number" id="rightInput" name="right crop" min={0} defaultValue={0} onChange={e => setRight(Number(e.target.value))} />
+            </div>
+            <button onClick={() => modifyImage((pixels: PixelImage) => crop(pixels, top, bottom, left, right))}>crop</button>
         </div >
     );
 };
