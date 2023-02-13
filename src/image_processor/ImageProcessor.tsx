@@ -33,10 +33,28 @@ function getPixelImageFromImageData(imageData: ImageData): PixelImage {
     return new PixelImage(tempPixels, tempPixels[0].length, tempPixels.length)
 }
 
+function getImageCanvasFromPixelImage(pixelImage: PixelImage): HTMLCanvasElement {
+    const modifiedCanvas = document.createElement('canvas');
+    modifiedCanvas.width = pixelImage.pixels[0].length;
+    modifiedCanvas.height = pixelImage.pixels.length;
+    const modifiedContext = modifiedCanvas.getContext('2d')!;
+    const modifiedImageData = modifiedContext.createImageData(modifiedCanvas.width, modifiedCanvas.height);
+    let index = 0;
+    for (const pixel of pixelImage.pixels.flat()) {
+        modifiedImageData.data[index++] = pixel.red;
+        modifiedImageData.data[index++] = pixel.green;
+        modifiedImageData.data[index++] = pixel.blue;
+        modifiedImageData.data[index++] = pixel.alpha;
+    }
+    modifiedContext.putImageData(modifiedImageData, 0, 0);
+    return modifiedCanvas
+}
+
 class PixelImage {
     pixels: Pixel[][]
     width: number
     height: number
+    angle: number = 0
 
 
     constructor(pixels: Pixel[][], width: number, height: number) {
@@ -45,20 +63,10 @@ class PixelImage {
         this.height = height
     }
 
-
-    createImageData(): ImageData {
-        const data = new Uint8ClampedArray(this.width * this.height * 4);
-
-        let index = 0;
-        for (const pixel of this.pixels.flat()) {
-            data[index++] = pixel.red;
-            data[index++] = pixel.green;
-            data[index++] = pixel.blue;
-            data[index++] = pixel.alpha;
-        }
-
-        const imageData = new ImageData(data, this.width, this.height);
-        return imageData
+    overwrite(pixels: Pixel[][], width: number, height: number) {
+        this.pixels = pixels
+        this.width = width
+        this.height = height
     }
 }
 
@@ -100,9 +108,37 @@ function flipVertically(pixelImage: PixelImage) {
     }
 }
 
+function changeSize(pixelImage: PixelImage) {
+    const modifiedCanvas = document.createElement('canvas');
+    modifiedCanvas.width = pixelImage.pixels[0].length;
+    modifiedCanvas.height = pixelImage.pixels.length;
+    const modifiedContext = modifiedCanvas.getContext('2d')!;
+    const modifiedImageData = modifiedContext.createImageData(modifiedCanvas.width, modifiedCanvas.height);
+    for (let i = 0; i < pixelImage.pixels.length; i++) {
+        for (let j = 0; j < pixelImage.pixels[0].length; j++) {
+            const pixelData = pixelImage.pixels[i][j];
+            const index = (i * modifiedCanvas.width + j) * 4;
+            modifiedImageData.data[index] = pixelData.red;
+            modifiedImageData.data[index + 1] = pixelData.green;
+            modifiedImageData.data[index + 2] = pixelData.blue;
+            modifiedImageData.data[index + 3] = pixelData.alpha;
+        }
+    }
+    modifiedContext.putImageData(modifiedImageData, 0, 0);
+}
+
 function rotate(pixelImage: PixelImage, degrees: number = 3) {
     const pixels = pixelImage.pixels
     alert("not implemented yet, degrees: " + degrees)
+}
+
+
+function crop(pixelImage: PixelImage, pixelsFromTop: number) {
+    const newPixels = pixelImage.pixels.slice(pixelsFromTop);
+
+    pixelImage.overwrite(newPixels,
+        newPixels[0].length,
+        newPixels.length);
 }
 
 const ModifyImage: React.FC = () => {
@@ -131,9 +167,7 @@ const ModifyImage: React.FC = () => {
 
                 modifyFunction(pixelImage)
 
-
-                ctx.putImageData(pixelImage.createImageData(), 0, 0);
-                setImage(canvas.toDataURL());
+                setImage(getImageCanvasFromPixelImage(pixelImage).toDataURL());
             }
         }
     };
@@ -141,12 +175,15 @@ const ModifyImage: React.FC = () => {
     return (
         <div>
             <img ref={imageRef} src={image} alt="Image" />
+            <button onClick={() => setImage(bars)}>Reset</button>
             <button onClick={() => modifyImage(invertPixels)}>Invert Pixels</button>
             <button onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</button>
             <button onClick={() => modifyImage(flipVertically)}>Flip vertically</button>
             <input type='number' defaultValue={45} onChange={e => setRotateAmount(parseInt(e.target.value, 10) || 0)} />
             <button onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount))}>rotate</button>
-        </div>
+            <button onClick={() => modifyImage((pixels: PixelImage) => crop(pixels, 10))}>crop</button>
+
+        </div >
     );
 };
 
