@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect } from "react";
-import { crop, flipHorizontally, flipVertically, invertPixels, Pixel, PixelImage, rotate } from './PixelOperations'
+import { crop, flipHorizontally, flipVertically, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 
 
 function getPixelImageFromImageData(imageData: ImageData): PixelImage {
@@ -37,7 +37,6 @@ function getImageCanvasFromPixelImage(pixelImage: PixelImage): HTMLCanvasElement
 }
 
 
-
 const ModifyImage: React.FC = () => {
     const defaultImage = bars
     const [image, setImage] = useState(defaultImage);
@@ -49,6 +48,9 @@ const ModifyImage: React.FC = () => {
     const [bottom, setBottom] = useState(0);
     const [left, setLeft] = useState(0);
     const [right, setRight] = useState(0);
+    const [scale, setScale] = useState(1);
+
+    const [scaleOption, setScaleOption] = useState(ScaleOptions.BICUBIC);
 
 
     useEffect(() => {
@@ -117,7 +119,44 @@ const ModifyImage: React.FC = () => {
                 <input type="number" id="rightInput" name="right crop" min={0} defaultValue={0} onChange={e => setRight(Number(e.target.value))} />
             </div>
             <button onClick={() => modifyImage((pixels: PixelImage) => crop(pixels, top, bottom, left, right))}>crop</button>
+            <br />
+            <div>
+                <label htmlFor="scaleInput">Scale:</label>
+                <input type="number" id="scaleInput" defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setScale(Number(e.target.value))} />
+            </div>
+            <div>
+                <label>
+                    <input
+                        type="radio"
+                        name="Bicubic"
+                        checked={scaleOption === ScaleOptions.BICUBIC}
+                        onChange={() => setScaleOption(ScaleOptions.BICUBIC)}
+                    />
+                    Bicubic interpolation
+                </label>
+                <label>
+                    <input
+                        type="radio"
+                        name="Bilinear"
+                        checked={scaleOption === ScaleOptions.BILINEAR}
+                        onChange={() => setScaleOption(ScaleOptions.BILINEAR)}
+                    />
+                    Bilinear interpolation
+                </label>
+                <label>
+                    <input
+                        type="radio"
+                        name="options"
+                        checked={scaleOption === ScaleOptions.NEAREST}
+                        onChange={() => setScaleOption(ScaleOptions.NEAREST)}
+                    />
+                    Nearest neighbour interpolation
+                </label>
+            </div>
+            <button onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</button>
+
         </div >
+
     );
 };
 

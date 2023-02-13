@@ -11,12 +11,16 @@ export class Pixel {
         this.alpha = alpha
         this.disabled = false
     }
+
+    copyFrom(): Pixel {
+        return new Pixel(this.red, this.green, this.blue, this.alpha, this.disabled)
+    }
 }
 
 export class PixelImage {
     pixels: Pixel[][]
-    width: number
-    height: number
+    private width: number
+    private height: number
     angle: number = 0
 
 
@@ -30,6 +34,13 @@ export class PixelImage {
         this.pixels = pixels
         this.width = width
         this.height = height
+    }
+
+    getWidth(): number {
+        return this.pixels[0].length
+    }
+    getHeight(): number {
+        return this.pixels.length
     }
 }
 
@@ -88,4 +99,50 @@ export function crop(pixelImage: PixelImage, pixelsFromTop: number, pixelsFromBo
         pixelImage.pixels[i].splice(0, pixelsFromLeft);
         pixelImage.pixels[i].splice(pixelImage.pixels[i].length - pixelsFromRight, pixelsFromRight)
     }
+}
+
+function createBlankImage(width: number, height: number): PixelImage {
+    const newPixels: Pixel[][] = []
+    for (var i = 0; i < height; i++) {
+        const newRow: Pixel[] = []
+        for (var j = 0; j < width; j++) {
+            newRow.push(new Pixel(0, 0, 0, 0))
+        }
+        newPixels.push(newRow)
+    }
+    return new PixelImage(newPixels, newPixels[0].length, newPixels.length)
+}
+
+export const ScaleOptions = {
+    BICUBIC: 0,
+    BILINEAR: 1,
+    NEAREST: 2,
+}
+
+export function scaleImage(pixelImage: PixelImage, scale: number, type: number) {
+    const pixels = pixelImage.pixels
+
+    const newWidth = pixelImage.getWidth() * scale
+    const newHeight = pixelImage.getHeight() * scale
+
+    const newPixels: Pixel[][] = []
+    switch (type) {
+        case ScaleOptions.NEAREST:
+            for (var i = 0; i < newHeight; i++) {
+                const newRow: Pixel[] = []
+                for (var j = 0; j < newWidth; j++) {
+                    const nearestI = Math.max(Math.min(Math.round(i / scale), pixels.length - 1), 0)
+                    const nearestJ = Math.max(Math.min(Math.round(j / scale), pixels[0].length - 1), 0)
+                    const nearestPixel = pixels[nearestI][nearestJ]
+                    newRow.push(nearestPixel.copyFrom())
+                }
+                newPixels.push(newRow)
+            }
+            break;
+        default:
+            alert("not implemented yet")
+            return
+
+    }
+    pixelImage.overwrite(newPixels, newPixels[0].length, newPixels.length)
 }
