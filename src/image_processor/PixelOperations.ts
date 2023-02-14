@@ -16,7 +16,11 @@ export class Pixel {
         return new Pixel(this.red, this.green, this.blue, this.alpha, this.disabled)
     }
 
-    average(other: Pixel, bias: number = 0.5): Pixel {
+    createAveragedPixel(other: Pixel, bias: number = 0.5): Pixel {
+        if (bias < 0 || bias > 1) {
+            alert("fatal bias error, bias = " + bias + "!")
+            throw new Error("fatal bias error")
+        }
         if (this.disabled && !other.disabled) {
             return other.copyFrom()
         } else if (!this.disabled && other.disabled) {
@@ -139,6 +143,45 @@ export const ScaleOptions = {
     NEAREST: 2,
 }
 
+function doBilinearInterpolation(pixelImage: PixelImage, i: number, j: number): Pixel {
+    // get float coordinates
+    const originalI = boundNumber(i, 0, pixelImage.getHeight() - 1)
+    const originalJ = boundNumber(j, 0, pixelImage.getWidth() - 1)
+
+    // round down
+    const floorI = Math.floor(originalI)
+    const floorJ = Math.floor(originalJ)
+
+    // round up
+    const ceilI = Math.ceil(originalI)
+    const ceilJ = Math.ceil(originalJ)
+
+    // figure out bias
+    const biasI = ceilI - originalI
+    const biasJ = ceilJ - originalJ
+
+    // get 4 nearest pixe;s
+    const topLeft = pixelImage.pixels[floorI][floorJ]
+    const topRight = pixelImage.pixels[ceilI][floorJ]
+    const bottomLeft = pixelImage.pixels[floorI][ceilJ]
+    const bottomRight = pixelImage.pixels[ceilI][ceilJ]
+
+    // average out 4 nearest pixels with bias below
+    // (w+x+y+z)/4=((w+x)/2+(y+z)/2)/2
+
+    // average out top and bottom horizontal pairs
+    const top = topLeft.createAveragedPixel(topRight, biasI)
+    const bottom = bottomLeft.createAveragedPixel(bottomRight, biasI)
+
+    // average out resulting pair
+    const averaged = top.createAveragedPixel(bottom, biasJ)
+
+    return averaged
+}
+
+function doNearestNeighbourInterpolation(pixelImage: PixelImage, i: number, j: number): Pixel {
+    return pixelImage.pixels[boundNumber(Math.round(i), 0, pixelImage.pixels.length - 1)][boundNumber(Math.round(j), 0, pixelImage.pixels[0].length - 1)].copyFrom()
+}
 
 export function scaleImage(pixelImage: PixelImage, scale: number, type: number) {
     const pixels = pixelImage.pixels
@@ -153,10 +196,7 @@ export function scaleImage(pixelImage: PixelImage, scale: number, type: number) 
             for (var i = 0; i < newHeight; i++) {
                 const newRow: Pixel[] = []
                 for (var j = 0; j < newWidth; j++) {
-                    const nearestI = boundNumber(Math.round(i / scale), 0, pixels.length - 1)
-                    const nearestJ = boundNumber(Math.round(j / scale), 0, pixels[0].length - 1)
-                    const nearestPixel = pixels[nearestI][nearestJ]
-                    newRow.push(nearestPixel.copyFrom())
+                    newRow.push(doNearestNeighbourInterpolation(pixelImage, i / scale, j / scale))
                 }
                 newPixels.push(newRow)
             }
@@ -165,39 +205,7 @@ export function scaleImage(pixelImage: PixelImage, scale: number, type: number) 
             for (var i = 0; i < newHeight; i++) {
                 const newRow: Pixel[] = []
                 for (var j = 0; j < newWidth; j++) {
-                    // get float coordinates
-                    const originalI = i / scale
-                    const originalJ = j / scale
-
-                    // round down
-                    const intOriginalI = boundNumber(Math.floor(originalI), 0, pixelImage.getHeight() - 1)
-                    const intOriginalJ = boundNumber(Math.floor(originalJ), 0, pixelImage.getWidth() - 1)
-
-                    // round up
-                    const intCompareI = boundNumber(Math.ceil(originalI), 0, pixelImage.getHeight() - 1)
-                    const intCompareJ = boundNumber(Math.ceil(originalJ), 0, pixelImage.getWidth() - 1)
-
-                    // figure out bias
-                    const biasI = originalI - intOriginalI
-                    const biasJ = originalJ - intOriginalJ
-
-                    // get 4 nearest pixe;s
-                    const topLeft = pixels[intOriginalI][intOriginalJ]
-                    const topRight = pixels[intCompareI][intOriginalJ]
-                    const bottomLeft = pixels[intOriginalI][intCompareJ]
-                    const bottomRight = pixels[intCompareI][intCompareJ]
-
-                    // average out 4 nearest pixels with bias below
-                    // (w+x+y+z)/4=((w+x)/2+(y+z)/2)/2
-
-                    // average out top and bottom horizontal pairs
-                    const top = topLeft.average(topRight, biasI)
-                    const bottom = bottomLeft.average(bottomRight, biasI)
-
-                    // average out resulting pair
-                    const averaged = top.average(bottom, biasJ)
-
-                    newRow.push(averaged)
+                    newRow.push(doBilinearInterpolation(pixelImage, i / scale, j / scale))
                 }
                 newPixels.push(newRow)
             }
