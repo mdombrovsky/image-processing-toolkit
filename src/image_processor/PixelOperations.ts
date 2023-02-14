@@ -15,6 +15,21 @@ export class Pixel {
     copyFrom(): Pixel {
         return new Pixel(this.red, this.green, this.blue, this.alpha, this.disabled)
     }
+
+    average(other: Pixel, bias: number = 0.5): Pixel {
+        if (this.disabled && !other.disabled) {
+            return other.copyFrom()
+        } else if (!this.disabled && other.disabled) {
+            return this.copyFrom()
+        } else {
+            return new Pixel(
+                Math.floor((this.red * bias + other.red * (1 - bias))),
+                Math.floor((this.green * bias + other.green * (1 - bias))),
+                Math.floor((this.blue * bias + other.blue * (1 - bias))),
+                Math.floor((this.alpha * bias + other.alpha * (1 - bias)))
+            )
+        }
+    }
 }
 
 export class PixelImage {
@@ -113,11 +128,17 @@ function createBlankImage(width: number, height: number): PixelImage {
     return new PixelImage(newPixels, newPixels[0].length, newPixels.length)
 }
 
+
+function boundNumber(input: number, min: number, max: number): number {
+    return Math.max(Math.min(input, max), min)
+}
+
 export const ScaleOptions = {
     BICUBIC: 0,
     BILINEAR: 1,
     NEAREST: 2,
 }
+
 
 export function scaleImage(pixelImage: PixelImage, scale: number, type: number) {
     const pixels = pixelImage.pixels
@@ -125,6 +146,7 @@ export function scaleImage(pixelImage: PixelImage, scale: number, type: number) 
     const newWidth = pixelImage.getWidth() * scale
     const newHeight = pixelImage.getHeight() * scale
 
+    console.log(type)
     const newPixels: Pixel[][] = []
     switch (type) {
         case ScaleOptions.NEAREST:
@@ -135,6 +157,47 @@ export function scaleImage(pixelImage: PixelImage, scale: number, type: number) 
                     const nearestJ = Math.max(Math.min(Math.round(j / scale), pixels[0].length - 1), 0)
                     const nearestPixel = pixels[nearestI][nearestJ]
                     newRow.push(nearestPixel.copyFrom())
+                }
+                newPixels.push(newRow)
+            }
+            break;
+        case ScaleOptions.BILINEAR:
+            for (var i = 0; i < newHeight; i++) {
+                const newRow: Pixel[] = []
+                for (var j = 0; j < newWidth; j++) {
+                    // get float coordinates
+                    const originalI = i / scale
+                    const originalJ = j / scale
+
+                    // round down
+                    const intOriginalI = Math.min(Math.max(Math.floor(originalI), 0), pixelImage.getHeight() - 1)
+                    const intOriginalJ = Math.min(Math.max(Math.floor(originalJ), 0), pixelImage.getWidth() - 1)
+
+                    // round up
+                    const intCompareI = Math.min(Math.ceil(originalI), pixelImage.getHeight() - 1)
+                    const intCompareJ = Math.min(Math.ceil(originalJ), pixelImage.getWidth() - 1)
+
+                    // figure out bias
+                    const biasI = originalI - intOriginalI
+                    const biasJ = originalJ - intOriginalJ
+
+                    // get 4 nearest pixe;s
+                    const topLeft = pixels[intOriginalI][intOriginalJ]
+                    const topRight = pixels[intCompareI][intOriginalJ]
+                    const bottomLeft = pixels[intOriginalI][intCompareJ]
+                    const bottomRight = pixels[intCompareI][intCompareJ]
+
+                    // average out 4 nearest pixels with bias below
+                    // (w+x+y+z)/4=((w+x)/2+(y+z)/2)/2
+
+                    // average out top and bottom horizontal pairs
+                    const top = topLeft.average(topRight, biasI)
+                    const bottom = bottomLeft.average(bottomRight, biasI)
+
+                    // average out resulting pair
+                    const averaged = top.average(bottom, biasJ)
+
+                    newRow.push(averaged)
                 }
                 newPixels.push(newRow)
             }
