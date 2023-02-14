@@ -153,8 +153,8 @@ export function scaleImage(pixelImage: PixelImage, scale: number, type: number) 
             for (var i = 0; i < newHeight; i++) {
                 const newRow: Pixel[] = []
                 for (var j = 0; j < newWidth; j++) {
-                    const nearestI = Math.max(Math.min(Math.round(i / scale), pixels.length - 1), 0)
-                    const nearestJ = Math.max(Math.min(Math.round(j / scale), pixels[0].length - 1), 0)
+                    const nearestI = boundNumber(Math.round(i / scale), 0, pixels.length - 1)
+                    const nearestJ = boundNumber(Math.round(j / scale), 0, pixels[0].length - 1)
                     const nearestPixel = pixels[nearestI][nearestJ]
                     newRow.push(nearestPixel.copyFrom())
                 }
@@ -170,12 +170,12 @@ export function scaleImage(pixelImage: PixelImage, scale: number, type: number) 
                     const originalJ = j / scale
 
                     // round down
-                    const intOriginalI = Math.min(Math.max(Math.floor(originalI), 0), pixelImage.getHeight() - 1)
-                    const intOriginalJ = Math.min(Math.max(Math.floor(originalJ), 0), pixelImage.getWidth() - 1)
+                    const intOriginalI = boundNumber(Math.floor(originalI), 0, pixelImage.getHeight() - 1)
+                    const intOriginalJ = boundNumber(Math.floor(originalJ), 0, pixelImage.getWidth() - 1)
 
                     // round up
-                    const intCompareI = Math.min(Math.ceil(originalI), pixelImage.getHeight() - 1)
-                    const intCompareJ = Math.min(Math.ceil(originalJ), pixelImage.getWidth() - 1)
+                    const intCompareI = boundNumber(Math.ceil(originalI), 0, pixelImage.getHeight() - 1)
+                    const intCompareJ = boundNumber(Math.ceil(originalJ), 0, pixelImage.getWidth() - 1)
 
                     // figure out bias
                     const biasI = originalI - intOriginalI
