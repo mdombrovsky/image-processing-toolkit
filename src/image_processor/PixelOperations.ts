@@ -4,7 +4,7 @@ export class Pixel {
     blue: number;
     alpha: number;
     disabled: boolean;
-    constructor(red: number, green: number, blue: number, alpha: number, disabled: boolean = false) {
+    constructor(red: number, green: number, blue: number, alpha: number = 255, disabled: boolean = false) {
         this.red = red
         this.green = green
         this.blue = blue
@@ -100,11 +100,97 @@ export function flipVertically(pixelImage: PixelImage) {
     }
 }
 
-export function rotate(pixelImage: PixelImage, degrees: number = 3) {
-    const pixels = pixelImage.pixels
-    alert("not implemented yet, degrees: " + degrees)
+function createRotationMatrix(degrees: number): number[][] {
+    const radians = degrees * (Math.PI / 180)
+    return [
+        [Math.cos(radians), -Math.sin(radians)],
+        [Math.sin(radians), Math.cos(radians)],
+    ];
 }
 
+function createInverseRotationTranslationMatrix(radians: number, xTranslation: number, yTransaltion: number): number[][] {
+    return [
+        [Math.cos(radians), Math.sin(radians), xTranslation],
+        [-Math.sin(radians), Math.cos(radians), yTransaltion],
+        [0, 0, 1]
+    ];
+}
+
+
+function multiplyMatrices(a: number[][], b: number[][]): number[][] {
+    const numRowsA = a.length;
+    const numColsA = a[0].length;
+    const numRowsB = b.length;
+    const numColsB = b[0].length;
+
+    if (numColsA !== numRowsB) {
+        throw new Error(`Cannot multiply A cols (${numColsA}) not equal to B rows (${numRowsB})`);
+    }
+
+    const result: number[][] = [];
+    for (var i = 0; i < numRowsA; i++) {
+        const row: number[] = []
+        for (var j = 0; j < numColsB; j++) {
+            var sum = 0
+            for (var k = 0; k < numColsA; k++) {
+                sum += a[i][k] * b[k][j]
+            }
+            row.push(sum)
+        }
+        result.push(row)
+    }
+
+    return result
+}
+
+
+export function rotate(pixelImage: PixelImage, degrees: number = 3) {
+    const pixels = pixelImage.pixels
+    const radians = (degrees) * (Math.PI / 180)
+    const sin = Math.sin(radians)
+    const cos = Math.cos(radians)
+    const oldHeight = pixelImage.getHeight()
+    const oldWidth = pixelImage.getWidth()
+    const newHeight = Math.round(Math.abs(oldHeight * cos) + Math.abs(oldWidth * sin))
+    const newWidth = Math.round(Math.abs(oldHeight * sin) + Math.abs(oldWidth * cos))
+
+    const hDiff = Math.abs(newHeight - oldHeight)
+    const wDiff = Math.abs(newWidth - oldWidth)
+
+    console.log(wDiff, hDiff)/*0, 0*/
+
+    const newPixels: Pixel[][] = []
+    const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, wDiff / 2, hDiff / 2)
+
+    for (var i = 0; i < newHeight; i++) {
+        const newRow: Pixel[] = []
+        for (var j = 0; j < newWidth; j++) {
+            const res = multiplyMatrices(inverseRoationMatrix, [[i], [j], [1]])
+            const [[oldI], [oldJ], [_]] = res
+            if (oldI < 0 || oldJ < 0 || oldI >= pixelImage.getHeight() || oldJ >= pixelImage.getWidth()) {
+                newRow.push(new Pixel(155, 0, 0))
+
+            } else {
+                const newPixel = doNearestNeighbourInterpolation(pixelImage, oldI, oldJ)
+                newRow.push(newPixel)
+            }
+        }
+        newPixels.push(newRow)
+    }
+    pixelImage.overwrite(newPixels, newPixels[0].length, newPixels.length)
+}
+
+function highlight(pixelImage: PixelImage) {
+    for (var i = 0; i < 10; i++) {
+        for (var j = 0; j < 10; j++) {
+            const pixel = pixelImage.pixels[i][j]
+            pixel.blue = 0
+            pixel.green = 255
+            pixel.red = 0
+        }
+    }
+    return
+}
 
 export function crop(pixelImage: PixelImage, pixelsFromTop: number, pixelsFromBottom: number, pixelsFromLeft: number, pixelsFromRight: number) {
     pixelsFromTop = Math.max(0, pixelsFromTop)
