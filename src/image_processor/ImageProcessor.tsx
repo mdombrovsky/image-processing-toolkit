@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect } from "react";
-import { crop, flipHorizontally, flipVertically, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { crop, flipHorizontally, flipVertically, gaussianBlur, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 
 
 function getPixelImageFromImageData(imageData: ImageData): PixelImage {
@@ -154,6 +154,7 @@ const ModifyImage: React.FC = () => {
                 </label>
             </div>
             <button onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</button>
+            <button onClick={() => modifyImage(gaussianBlur)}>Perform gaussian blur</button>
 
         </div >
 

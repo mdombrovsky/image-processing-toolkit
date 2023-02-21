@@ -34,6 +34,17 @@ export class Pixel {
             )
         }
     }
+    overwrite(red: number, green: number, blue: number, alpha: number = 255, disabled: boolean = false) {
+        this.red = red
+        this.green = green
+        this.blue = blue
+        this.alpha = alpha
+        this.disabled = false
+    }
+}
+
+function wrapOverflow(input: number, max: number) {
+    return (input % (max + 1) + (max + 1)) % (max + 1)
 }
 
 export class PixelImage {
@@ -302,4 +313,59 @@ export function scaleImage(pixelImage: PixelImage, scale: number, type: number) 
 
     }
     pixelImage.overwrite(newPixels, newPixels[0].length, newPixels.length)
+}
+
+export function gaussianBlur(pixelImage: PixelImage) {
+    const kernel = [
+        [1 / 16, 1 / 8, 1 / 16],
+        [1 / 8, 1 / 4, 1 / 8],
+        [1 / 16, 1 / 8, 1 / 16],
+    ];
+
+    performConvolution(pixelImage.pixels, kernel)
+}
+
+function performConvolution(pixels: Pixel[][], kernel: number[][]) {
+    const flippedKernel = getFlippedKernel(kernel)
+    const height = pixels.length
+    const width = pixels[0].length
+    const kHeight = flippedKernel.length
+    const kWidth = flippedKernel[0].length
+    const kIAdjustment = Math.floor(kHeight / 2)
+    const kJAdjustment = Math.floor(kWidth / 2)
+
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            let r = 0, g = 0, b = 0
+            for (let kI = 0; kI < kHeight; kI++) {
+                for (let kJ = 0; kJ < kWidth; kJ++) {
+                    // transformed indecies
+                    const tI = i + kI - kIAdjustment
+                    const tJ = j + kJ - kJAdjustment
+                    const pixel = (tI >= 0 && tJ >= 0 && tI < height && tJ < width) ? pixels[tI][tJ] : pixels[i][j]
+                    const kernelValue = flippedKernel[kI][kJ]
+                    r += pixel.red * kernelValue
+                    g += pixel.green * kernelValue
+                    b += pixel.blue * kernelValue
+                }
+            }
+            pixels[i][j].overwrite(r, g, b)
+            // not sure if i should wrap these values
+            // pixels[i][j].overwrite(wrapOverflow(r, 255), wrapOverflow(g, 255), wrapOverflow(b, 255))
+        }
+    }
+
+}
+function getFlippedKernel(kernel: number[][]): number[][] {
+    const height = kernel.length
+    const width = kernel[0].length
+    const newKernel: number[][] = []
+    for (var i = 0; i < height; i++) {
+        const row: number[] = []
+        for (var j = 0; j < width; j++) {
+            row.push(kernel[height - 1 - i][width - 1 - j])
+        }
+        newKernel.push(row)
+    }
+    return newKernel
 }
