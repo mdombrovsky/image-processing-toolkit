@@ -39,7 +39,8 @@ function getImageCanvasFromPixelImage(pixelImage: PixelImage): HTMLCanvasElement
 
 const ModifyImage: React.FC = () => {
     const defaultImage = bars
-    const [image, setImage] = useState(defaultImage);
+    const [loadedImage, setLoadedImage] = useState(defaultImage)
+    const [image, setImage] = useState(loadedImage);
     const imageRef = useRef<HTMLImageElement>(null);
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
@@ -88,6 +89,15 @@ const ModifyImage: React.FC = () => {
         }
     };
 
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const newImage = URL.createObjectURL(event.target.files[0]);
+            setLoadedImage(newImage);
+            setImage(newImage);
+
+        }
+    };
+
     return (
         <div>
             <img ref={imageRef} src={image} alt="Image" />
@@ -96,7 +106,13 @@ const ModifyImage: React.FC = () => {
                 Height: {height} <br />
                 Width: {width} <br />
             </text>
-            <button onClick={() => setImage(bars)}>Reset</button>
+            <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+            />
+            <button onClick={() => setImage(loadedImage)}>Reset</button>
             <button onClick={() => modifyImage(invertPixels)}>Invert Pixels</button>
             <button onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</button>
             <button onClick={() => modifyImage(flipVertically)}>Flip vertically</button>
