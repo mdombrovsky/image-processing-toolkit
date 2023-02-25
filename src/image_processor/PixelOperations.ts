@@ -369,3 +369,79 @@ function getFlippedKernel(kernel: number[][]): number[][] {
     }
     return newKernel
 }
+
+export interface Histogram {
+    redHistogram: number[]
+    greenHistogram: number[]
+    blueHistogram: number[]
+}
+
+export function createHistogram(image: PixelImage): Histogram {
+    const height = image.pixels.length
+    const width = image.pixels[0].length
+    const pixelValues = 256
+
+    // create regular histogram
+    const redHistogram: number[] = new Array(pixelValues).fill(0)
+    const greenHistogram: number[] = new Array(pixelValues).fill(0)
+    const blueHistogram: number[] = new Array(pixelValues).fill(0)
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            redHistogram[image.pixels[i][j].red]++
+            greenHistogram[image.pixels[i][j].green]++
+            blueHistogram[image.pixels[i][j].blue]++
+        }
+    }
+
+    return {
+        redHistogram, blueHistogram, greenHistogram
+    }
+
+}
+export function histogramEqualization(image: PixelImage) {
+    const height = image.pixels.length
+    const width = image.pixels[0].length
+    const pixelValues = 256
+
+    const histogram = createHistogram(image)
+
+    // create normalized cumulative histogram transition function
+    const numPixels = height * width
+    const redTransition: number[] = new Array(pixelValues).fill(0)
+    const greenTransition: number[] = new Array(pixelValues).fill(0)
+    const blueTransition: number[] = new Array(pixelValues).fill(0)
+
+    for (let i = 0; i < pixelValues; i++) {
+        // add normalized values
+        redTransition[i] += histogram.redHistogram[i] / numPixels
+        greenTransition[i] += histogram.greenHistogram[i] / numPixels
+        blueTransition[i] += histogram.blueHistogram[i] / numPixels
+
+        // keep cumulative values
+        if (i + 1 < pixelValues) {
+            redTransition[i + 1] = redTransition[i]
+            greenTransition[i + 1] = greenTransition[i]
+            blueTransition[i + 1] = blueTransition[i]
+        }
+
+        // now that values are normalized cumulative we can convert them to pixels
+        redTransition[i] = Math.round(redTransition[i] * pixelValues)
+        greenTransition[i] = Math.round(greenTransition[i] * pixelValues)
+        blueTransition[i] = Math.round(blueTransition[i] * pixelValues)
+    }
+
+
+    // apply transition function to every pixel
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            const pixel = image.pixels[i][j]
+            pixel.overwrite(
+                redTransition[pixel.red],
+                greenTransition[pixel.green],
+                blueTransition[pixel.blue]
+            )
+        }
+    }
+
+
+}   
