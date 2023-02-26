@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { createHistogram, crop, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
 
 function getPixelImageFromImageData(imageData: ImageData): PixelImage {
@@ -39,10 +39,11 @@ function getImageCanvasFromPixelImage(pixelImage: PixelImage): HTMLCanvasElement
 
 const ModifyImage: React.FC = () => {
     const defaultImage = bars
+    const defaultAltImage = <div />
     const [loadedImage, setLoadedImage] = useState(defaultImage)
     const [image, setImage] = useState(loadedImage);
     const imageRef = useRef<HTMLImageElement>(null);
-    const [altImage, setAltImage] = useState<ReactElement>(<img src={defaultImage} />);
+    const [altImage, setAltImage] = useState<ReactElement>(defaultAltImage);
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [rotateAmount, setRotateAmount] = useState(45);
@@ -100,8 +101,14 @@ const ModifyImage: React.FC = () => {
     };
 
 
-    function updateHistogram(image: PixelImage) {
-        const histogram = createHistogram(image)
+    function plotCumulativeNormalizedHistogram(image: PixelImage) {
+        plotHistogram(createNormalizedCumulativeHistogram(image))
+    }
+    function plotFrequencyHistogram(image: PixelImage) {
+        plotHistogram(createFrequencyHistogram(image), true)
+    }
+
+    function plotHistogram(histogram: Histogram, useLog = false) {
         const plot = <Plot
             data={[
                 {
@@ -132,7 +139,7 @@ const ModifyImage: React.FC = () => {
                     range: [0, 255],
                 },
                 yaxis: {
-                    type: 'log'
+                    type: useLog ? 'log' : 'linear'
                 }
             }}
             style={{ width: '70vw', height: '50vh', margin: "auto" }}
@@ -145,13 +152,13 @@ const ModifyImage: React.FC = () => {
     return (
         <div>
             <img ref={imageRef} src={image} alt="Image" />
-            <br />
-            {altImage}
             <text>
                 <br />
                 Height: {height} <br />
                 Width: {width} <br />
             </text>
+            {altImage}
+            <br />
             <input
                 id="image-upload"
                 type="file"
@@ -159,6 +166,7 @@ const ModifyImage: React.FC = () => {
                 onChange={handleImageUpload}
             />
             <button onClick={() => setImage(loadedImage)}>Reset</button>
+            <button onClick={() => setAltImage(defaultAltImage)}>Hide secondary display</button>
             <button onClick={() => modifyImage(invertPixels)}>Invert Pixels</button>
             <button onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</button>
             <button onClick={() => modifyImage(flipVertically)}>Flip vertically</button>
@@ -218,9 +226,10 @@ const ModifyImage: React.FC = () => {
             <button onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</button>
             <button onClick={() => modifyImage(gaussianBlur)}>Perform gaussian blur</button>
             <button onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</button>
-            <button onClick={() => modifyImage(updateHistogram)}>Compute histogram</button>
-        </div >
+            <button onClick={() => modifyImage(plotFrequencyHistogram)}>Compute frequency histogram</button>
+            <button onClick={() => modifyImage(plotCumulativeNormalizedHistogram)}>Compute cumulative normalized histogram</button>
 
+        </div >
     );
 };
 

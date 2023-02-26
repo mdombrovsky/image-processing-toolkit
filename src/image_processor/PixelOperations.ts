@@ -376,7 +376,7 @@ export interface Histogram {
     blueHistogram: number[]
 }
 
-export function createHistogram(image: PixelImage): Histogram {
+export function createFrequencyHistogram(image: PixelImage): Histogram {
     const height = image.pixels.length
     const width = image.pixels[0].length
     const pixelValues = 256
@@ -398,36 +398,54 @@ export function createHistogram(image: PixelImage): Histogram {
     }
 
 }
+
+export function createNormalizedCumulativeHistogram(image: PixelImage): Histogram {
+    const height = image.pixels.length
+    const width = image.pixels[0].length
+    const numPixels = height * width
+    const histogram = createFrequencyHistogram(image)
+    const pixelValues = 256
+
+    // create normalized cumulative histogram 
+    const redNCH: number[] = new Array(pixelValues).fill(0)
+    const greenNCH: number[] = new Array(pixelValues).fill(0)
+    const blueNCH: number[] = new Array(pixelValues).fill(0)
+
+    for (let i = 0; i < pixelValues; i++) {
+        // add normalized values
+        redNCH[i] += histogram.redHistogram[i] / numPixels
+        greenNCH[i] += histogram.greenHistogram[i] / numPixels
+        blueNCH[i] += histogram.blueHistogram[i] / numPixels
+
+        // keep cumulative values
+        if (i + 1 < pixelValues) {
+            redNCH[i + 1] = redNCH[i]
+            greenNCH[i + 1] = greenNCH[i]
+            blueNCH[i + 1] = blueNCH[i]
+        }
+    }
+
+    return {
+        redHistogram: redNCH, greenHistogram: greenNCH, blueHistogram: blueNCH
+    }
+}
+
 export function histogramEqualization(image: PixelImage) {
     const height = image.pixels.length
     const width = image.pixels[0].length
     const pixelValues = 256
 
-    const histogram = createHistogram(image)
+    // create normalized cumulative histogram 
+    const cnh = createNormalizedCumulativeHistogram(image)
 
-    // create normalized cumulative histogram transition function
-    const numPixels = height * width
+    // create transition functions
     const redTransition: number[] = new Array(pixelValues).fill(0)
     const greenTransition: number[] = new Array(pixelValues).fill(0)
     const blueTransition: number[] = new Array(pixelValues).fill(0)
-
     for (let i = 0; i < pixelValues; i++) {
-        // add normalized values
-        redTransition[i] += histogram.redHistogram[i] / numPixels
-        greenTransition[i] += histogram.greenHistogram[i] / numPixels
-        blueTransition[i] += histogram.blueHistogram[i] / numPixels
-
-        // keep cumulative values
-        if (i + 1 < pixelValues) {
-            redTransition[i + 1] = redTransition[i]
-            greenTransition[i + 1] = greenTransition[i]
-            blueTransition[i + 1] = blueTransition[i]
-        }
-
-        // now that values are normalized cumulative we can convert them to pixels
-        redTransition[i] = Math.round(redTransition[i] * pixelValues)
-        greenTransition[i] = Math.round(greenTransition[i] * pixelValues)
-        blueTransition[i] = Math.round(blueTransition[i] * pixelValues)
+        redTransition[i] = Math.round(cnh.redHistogram[i] * pixelValues)
+        greenTransition[i] = Math.round(cnh.greenHistogram[i] * pixelValues)
+        blueTransition[i] = Math.round(cnh.blueHistogram[i] * pixelValues)
     }
 
 
