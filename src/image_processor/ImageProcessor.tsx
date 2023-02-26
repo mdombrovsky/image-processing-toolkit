@@ -2,6 +2,7 @@ import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
 import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
 function getPixelImageFromImageData(imageData: ImageData): PixelImage {
     const tempPixels: Pixel[][] = []
@@ -150,86 +151,199 @@ const ModifyImage: React.FC = () => {
 
 
     return (
-        <div>
-            <img ref={imageRef} src={image} alt="Image" />
-            <text>
-                <br />
-                Height: {height} <br />
-                Width: {width} <br />
-            </text>
-            {altImage}
-            <br />
-            <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-            />
-            <button onClick={() => setImage(loadedImage)}>Reset</button>
-            <button onClick={() => setAltImage(defaultAltImage)}>Hide secondary display</button>
-            <button onClick={() => modifyImage(invertPixels)}>Invert Pixels</button>
-            <button onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</button>
-            <button onClick={() => modifyImage(flipVertically)}>Flip vertically</button>
-            <input type='number' defaultValue={45} onChange={e => setRotateAmount(parseInt(e.target.value, 10) || 0)} />
-            <button onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount))}>rotate</button>
-            <div>
-                <label htmlFor="topInput">Top:</label>
-                <input type="number" id="topInput" name="top crop" min={0} defaultValue={0} onChange={e => setTop(Number(e.target.value))} />
-            </div>
-            <div>
-                <label htmlFor="bottomInput">Bottom:</label>
-                <input type="number" id="bottomInput" name="bottom crop" min={0} defaultValue={0} onChange={e => setBottom(Number(e.target.value))} />
-            </div>
-            <div>
-                <label htmlFor="leftInput">Left:</label>
-                <input type="number" id="leftInput" name="left crop" min={0} defaultValue={0} onChange={e => setLeft(Number(e.target.value))} />
-            </div>
-            <div>
-                <label htmlFor="rightInput">Right:</label>
-                <input type="number" id="rightInput" name="right crop" min={0} defaultValue={0} onChange={e => setRight(Number(e.target.value))} />
-            </div>
-            <button onClick={() => modifyImage((pixels: PixelImage) => crop(pixels, top, bottom, left, right))}>crop</button>
-            <br />
-            <div>
-                <label htmlFor="scaleInput">Scale:</label>
-                <input type="number" id="scaleInput" defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setScale(Number(e.target.value))} />
-            </div>
-            <div>
-                <label>
-                    <input
-                        type="radio"
-                        name="Bicubic"
-                        checked={scaleOption === ScaleOptions.BICUBIC}
-                        onChange={() => setScaleOption(ScaleOptions.BICUBIC)}
-                    />
-                    Bicubic interpolation
-                </label>
-                <label>
-                    <input
-                        type="radio"
-                        name="Bilinear"
-                        checked={scaleOption === ScaleOptions.BILINEAR}
-                        onChange={() => setScaleOption(ScaleOptions.BILINEAR)}
-                    />
-                    Bilinear interpolation
-                </label>
-                <label>
-                    <input
-                        type="radio"
-                        name="options"
-                        checked={scaleOption === ScaleOptions.NEAREST}
-                        onChange={() => setScaleOption(ScaleOptions.NEAREST)}
-                    />
-                    Nearest neighbour interpolation
-                </label>
-            </div>
-            <button onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</button>
-            <button onClick={() => modifyImage(gaussianBlur)}>Perform gaussian blur</button>
-            <button onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</button>
-            <button onClick={() => modifyImage(plotFrequencyHistogram)}>Compute frequency histogram</button>
-            <button onClick={() => modifyImage(plotCumulativeNormalizedHistogram)}>Compute cumulative normalized histogram</button>
+        <Container>
+            <Row>
+                <Col>
+                    <img ref={imageRef} src={image} alt="Image" />
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <p>
+                        Height: {height},
+                        Width: {width}
+                    </p>
+                </Col>
+                <Col>
+                    <Form.Group controlId="formFile" >
+                        <Form.Control type="file" accept="image/*" onChange={handleImageUpload} />
+                    </Form.Group>
+                </Col>
+                <Col>
+                    <Row>
+                        <Col>
+                            <Button variant="danger" onClick={() => {
+                                setImage(loadedImage)
+                                setAltImage(defaultAltImage)
+                            }}>Reset</Button>
+                        </Col>
+                        <Col>
+                            <Button variant="warning" onClick={() => setAltImage(defaultAltImage)}>Hide secondary display</Button>
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
+            <Row>
+                {altImage}
+            </Row>
+            <Row className="align-items-center">
+                <Col>
+                    <Form.Group>
+                        <Row className="align-items-center">
+                            <Col>
+                                <Row>
+                                    <Form.Label htmlFor="topInput">Top:</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        id="topInput"
+                                        name="top crop"
+                                        min={0}
+                                        defaultValue={0}
+                                        onChange={(e) => setTop(Number(e.target.value))}
+                                    />
+                                </Row>
+                                <Row>
+                                    <Form.Label htmlFor="bottomInput">Bottom:</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        id="bottomInput"
+                                        name="bottom crop"
+                                        min={0}
+                                        defaultValue={0}
+                                        onChange={(e) => setBottom(Number(e.target.value))}
+                                    />
+                                </Row>
+                            </Col>
+                            <Col>
+                                <Row>
+                                    <Form.Label htmlFor="leftInput">Left:</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        id="leftInput"
+                                        name="left crop"
+                                        min={0}
+                                        defaultValue={0}
+                                        onChange={(e) => setLeft(Number(e.target.value))}
+                                    />
+                                </Row>
+                                <Row>
+                                    <Form.Label htmlFor="rightInput">Right:</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        id="rightInput"
+                                        name="right crop"
+                                        min={0}
+                                        defaultValue={0}
+                                        onChange={(e) => setRight(Number(e.target.value))}
+                                    />
+                                </Row>
+                            </Col>
+                            <Col>
+                                <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => crop(pixels, top, bottom, left, right))}>
+                                    crop
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Form.Group>
 
-        </div >
+                </Col>
+                <Col>
+                    <Row className="align-items-center">
+                        <Form.Group>
+                            <Row className="align-items-center">
+                                <Col>
+                                    <Form.Label>Rotate amount:</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        defaultValue={45}
+                                        onChange={e => setRotateAmount(parseInt(e.target.value, 10) || 0)}
+                                    />
+                                </Col>
+                                <Col>
+                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount))}>rotate</Button>
+                                </Col>
+                            </Row>
+                        </Form.Group>
+                    </Row>
+                    <Row className="align-items-center">
+                        <Form.Group>
+                            <Row className="align-items-center">
+                                <Col>
+                                    <Form.Label>Scale:</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setScale(Number(e.target.value))}
+                                    />
+                                </Col>
+                                <Col>
+                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</Button>
+
+                                </Col>
+                            </Row>
+                        </Form.Group>
+                    </Row>
+                </Col>
+                <Col className="aligh-items-center">
+                    <Form.Group>
+                        <Form.Check
+                            type="radio"
+                            name="scaleOption"
+                            id="bicubic"
+                            label="Bicubic interpolation"
+                            checked={scaleOption === ScaleOptions.BICUBIC}
+                            onChange={() => setScaleOption(ScaleOptions.BICUBIC)}
+                        />
+                        <Form.Check
+                            type="radio"
+                            name="scaleOption"
+                            id="bilinear"
+                            label="Bilinear interpolation"
+                            checked={scaleOption === ScaleOptions.BILINEAR}
+                            onChange={() => setScaleOption(ScaleOptions.BILINEAR)}
+                        />
+                        <Form.Check
+                            type="radio"
+                            name="scaleOption"
+                            id="nearest"
+                            label="Nearest neighbour interpolation"
+                            checked={scaleOption === ScaleOptions.NEAREST}
+                            onChange={() => setScaleOption(ScaleOptions.NEAREST)}
+                        />
+                    </Form.Group>
+                </Col>
+            </Row >
+            <Row>
+                <Col>
+                    <Button variant="secondary" onClick={() => modifyImage(invertPixels)}>Invert Pixels</Button>
+                </Col>
+                <Col>
+                    <Button variant="secondary" onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</Button>
+                </Col>
+
+                <Col>
+                    <Button variant="secondary" onClick={() => modifyImage(flipVertically)}>Flip vertically</Button>
+
+                </Col>
+            </Row>
+
+            <Row>
+                <Col>
+                    <Button variant="secondary" onClick={() => modifyImage(gaussianBlur)}>Perform gaussian blur</Button>
+                </Col>
+                <Col>
+                    <Button variant="secondary" onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</Button>
+                </Col>
+            </Row>
+
+            <Row>
+                <Col>
+                    <Button variant="info" onClick={() => modifyImage(plotFrequencyHistogram)}>Compute frequency histogram</Button>
+                </Col>
+                <Col>
+                    <Button variant="info" onClick={() => modifyImage(plotCumulativeNormalizedHistogram)}>Compute cumulative normalized histogram</Button>
+                </Col>
+            </Row>
+        </Container >
     );
 };
 
