@@ -1,7 +1,7 @@
 import bars from '../images/bars_test_image.png'
-import React, { useState, useRef, useEffect } from "react";
-import { crop, flipHorizontally, flipVertically, gaussianBlur, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
-
+import React, { useState, useRef, useEffect, ReactElement } from "react";
+import { createHistogram, crop, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import Plot from 'react-plotly.js';
 
 function getPixelImageFromImageData(imageData: ImageData): PixelImage {
     const tempPixels: Pixel[][] = []
@@ -42,6 +42,7 @@ const ModifyImage: React.FC = () => {
     const [loadedImage, setLoadedImage] = useState(defaultImage)
     const [image, setImage] = useState(loadedImage);
     const imageRef = useRef<HTMLImageElement>(null);
+    const [altImage, setAltImage] = useState<ReactElement>(<img src={defaultImage} />);
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [rotateAmount, setRotateAmount] = useState(45);
@@ -98,9 +99,54 @@ const ModifyImage: React.FC = () => {
         }
     };
 
+
+    function updateHistogram(image: PixelImage) {
+        const histogram = createHistogram(image)
+        const plot = <Plot
+            data={[
+                {
+                    x: Array.from({ length: histogram.redHistogram.length }, (_, i) => i),
+                    y: histogram.redHistogram,
+                    type: 'bar',
+                    name: 'Red Pixels Count',
+                    marker: { color: 'red' },
+                },
+                {
+                    x: Array.from({ length: histogram.greenHistogram.length }, (_, i) => i),
+                    y: histogram.greenHistogram,
+                    type: 'bar',
+                    name: 'Green Pixels Count',
+                    marker: { color: 'green' },
+                },
+                {
+                    x: Array.from({ length: histogram.blueHistogram.length }, (_, i) => i),
+                    y: histogram.blueHistogram,
+                    type: 'bar',
+                    name: 'Blue Pixels Count',
+                    marker: { color: 'blue' },
+                },
+            ]}
+            layout={{
+                title: 'Histogram',
+                xaxis: {
+                    range: [0, 255],
+                },
+                yaxis: {
+                    type: 'log'
+                }
+            }}
+            style={{ width: '70vw', height: '50vh', margin: "auto" }}
+        />
+
+        setAltImage(plot)
+    }
+
+
     return (
         <div>
             <img ref={imageRef} src={image} alt="Image" />
+            <br />
+            {altImage}
             <text>
                 <br />
                 Height: {height} <br />
@@ -171,7 +217,8 @@ const ModifyImage: React.FC = () => {
             </div>
             <button onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</button>
             <button onClick={() => modifyImage(gaussianBlur)}>Perform gaussian blur</button>
-
+            <button onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</button>
+            <button onClick={() => modifyImage(updateHistogram)}>Compute histogram</button>
         </div >
 
     );
