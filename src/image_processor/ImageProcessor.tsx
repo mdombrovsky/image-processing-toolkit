@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
@@ -53,8 +53,10 @@ const ModifyImage: React.FC = () => {
     const [left, setLeft] = useState(0);
     const [right, setRight] = useState(0);
     const [scale, setScale] = useState(1);
-
-    const [scaleOption, setScaleOption] = useState(ScaleOptions.BICUBIC);
+    const [scaleOption, setScaleOption] = useState(ScaleOptions.BILINEAR);
+    const [alpha, setAlpha] = useState(1);
+    const [beta, setBeta] = useState(0);
+    const [gamma, setGamma] = useState(1);
 
 
     useEffect(() => {
@@ -190,7 +192,7 @@ const ModifyImage: React.FC = () => {
                 <Col>
                     <Form.Group>
                         <Row className="align-items-center">
-                            <Col>
+                            <Col className="mx-1">
                                 <Row>
                                     <Form.Label htmlFor="topInput">Top:</Form.Label>
                                     <Form.Control
@@ -214,7 +216,7 @@ const ModifyImage: React.FC = () => {
                                     />
                                 </Row>
                             </Col>
-                            <Col>
+                            <Col className="">
                                 <Row>
                                     <Form.Label htmlFor="leftInput">Left:</Form.Label>
                                     <Form.Control
@@ -326,6 +328,52 @@ const ModifyImage: React.FC = () => {
                 </Col>
             </Row>
 
+            <Row>
+                <Form.Group>
+                    <Row className="align-items-center">
+                        <Col>
+                            <Form.Label>Alpha (α):</Form.Label>
+                            <Form.Control
+                                type="number"
+                                defaultValue={alpha}
+                                step={0.1}
+                                onChange={(e) => setAlpha(Number(e.target.value))}
+                            />
+                        </Col>
+                        <Col>
+                            <Form.Label>Beta (β):</Form.Label>
+                            <Form.Control
+                                type="number"
+                                defaultValue={beta}
+                                onChange={(e) => setBeta(Number(e.target.value))}
+                            />
+                        </Col>
+                        <Col>
+                            <Form.Label>Gamma (γ):</Form.Label>
+                            <Form.Control
+                                type="number"
+                                defaultValue={gamma}
+                                step={0.1}
+                                onChange={(e) => setGamma(Number(e.target.value))}
+                            />
+                        </Col>
+                        <Col>
+                            <Row className="mb-1">
+                                <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doLinearMapping(image, alpha, beta))}>
+                                    Linear mapping <br />m(u)=αu+β
+                                </Button>
+                            </Row>
+                            <Row className="">
+                                <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doPowerLawMapping(image, gamma))}>
+                                    Power law mapping <br /> m(u)=(L-)[u/(L-1)]^γ
+                                </Button>
+                            </Row>
+
+                        </Col>
+                    </Row>
+                </Form.Group>
+
+            </Row >
             <Row>
                 <Col>
                     <Button variant="secondary" onClick={() => modifyImage(gaussianBlur)}>Perform gaussian blur</Button>

@@ -5,6 +5,9 @@ export class Pixel {
     alpha: number;
     disabled: boolean;
     constructor(red: number, green: number, blue: number, alpha: number = 255, disabled: boolean = false) {
+        if (red > 255 || green > 255 || blue > 255 || red < 0 || green < 0 || blue < 0) {
+            alert("out of range: (" + red + ", " + green + ", " + blue + ")")
+        }
         this.red = red
         this.green = green
         this.blue = blue
@@ -35,6 +38,9 @@ export class Pixel {
         }
     }
     overwrite(red: number, green: number, blue: number, alpha: number = 255, disabled: boolean = false) {
+        if (red > 255 || green > 255 || blue > 255 || red < 0 || green < 0 || blue < 0) {
+            alert("out of range: (" + red + ", " + green + ", " + blue + ")")
+        }
         this.red = red
         this.green = green
         this.blue = blue
@@ -168,7 +174,7 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3) {
     const hDiff = Math.abs(newHeight - oldHeight)
     const wDiff = Math.abs(newWidth - oldWidth)
 
-    console.log(wDiff, hDiff)/*0, 0*/
+    console.log(wDiff, hDiff)
 
     const newPixels: Pixel[][] = []
     const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, wDiff / 2, hDiff / 2)
@@ -443,9 +449,9 @@ export function histogramEqualization(image: PixelImage) {
     const greenTransition: number[] = new Array(pixelValues).fill(0)
     const blueTransition: number[] = new Array(pixelValues).fill(0)
     for (let i = 0; i < pixelValues; i++) {
-        redTransition[i] = Math.round(cnh.redHistogram[i] * pixelValues)
-        greenTransition[i] = Math.round(cnh.greenHistogram[i] * pixelValues)
-        blueTransition[i] = Math.round(cnh.blueHistogram[i] * pixelValues)
+        redTransition[i] = Math.round(cnh.redHistogram[i] * (pixelValues - 1))
+        greenTransition[i] = Math.round(cnh.greenHistogram[i] * (pixelValues - 1))
+        blueTransition[i] = Math.round(cnh.blueHistogram[i] * (pixelValues - 1))
     }
 
 
@@ -462,4 +468,33 @@ export function histogramEqualization(image: PixelImage) {
     }
 
 
-}   
+}
+
+export function doLinearMapping(image: PixelImage, alpha: number, beta: number) {
+    const maxPixelValue = 255
+    doSinglePixelOperation(image, (pixelValue: number) => {
+        return boundNumber(Math.round(alpha * pixelValue + beta), 0, maxPixelValue)
+    })
+}
+
+export function doPowerLawMapping(image: PixelImage, gamma: number) {
+    const maxPixelValue = 255
+    doSinglePixelOperation(image, (pixelValue: number) => {
+        return boundNumber(Math.round(maxPixelValue * ((pixelValue * 1.00 / maxPixelValue) ** gamma)), 0, maxPixelValue)
+    })
+}
+
+function doSinglePixelOperation(image: PixelImage, operation: (pixelValue: number) => number) {
+    const height = image.pixels.length
+    const width = image.pixels[0].length
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            const pixel = image.pixels[i][j]
+            pixel.overwrite(
+                operation(pixel.red),
+                operation(pixel.green),
+                operation(pixel.blue),
+            )
+        }
+    }
+}
