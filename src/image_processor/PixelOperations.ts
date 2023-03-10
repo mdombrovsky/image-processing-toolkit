@@ -174,16 +174,19 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3) {
     const hDiff = Math.abs(newHeight - oldHeight)
     const wDiff = Math.abs(newWidth - oldWidth)
 
-    console.log(wDiff, hDiff)
 
     const newPixels: Pixel[][] = []
-    const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, wDiff / 2, hDiff / 2)
 
-    for (var i = 0; i < newHeight; i++) {
+    // Shift up and left so that center is at 0,0
+    const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, oldHeight / 2, oldWidth / 2)
+
+    // Re-create image treating 0,0 as new center
+    for (var i = -newHeight / 2; i < newHeight / 2; i++) {
         const newRow: Pixel[] = []
-        for (var j = 0; j < newWidth; j++) {
+        for (var j = -newWidth / 2; j < newWidth / 2; j++) {
             const res = multiplyMatrices(inverseRoationMatrix, [[i], [j], [1]])
-            const [[oldI], [oldJ], [_]] = res
+            const [[oldI], [oldJ]] = res
+
             if (oldI < 0 || oldJ < 0 || oldI >= pixelImage.getHeight() || oldJ >= pixelImage.getWidth()) {
                 newRow.push(new Pixel(155, 0, 0))
 
