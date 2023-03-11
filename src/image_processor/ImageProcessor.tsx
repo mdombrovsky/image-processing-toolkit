@@ -362,20 +362,21 @@ const ModifyImage: React.FC = () => {
                         />
                     </Form.Group>
                 </Col>
+                <Col>
+                    <Row className="mb-1">
+                        <Button variant="secondary" onClick={() => modifyImage(invertPixels)}>Invert Pixels</Button>
+
+                    </Row>
+                    <Row className="mb-1">
+                        <Button variant="secondary" onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</Button>
+
+                    </Row>
+                    <Row>
+                        <Button variant="secondary" onClick={() => modifyImage(flipVertically)}>Flip vertically</Button>
+
+                    </Row>
+                </Col>
             </Row >
-            <Row>
-                <Col>
-                    <Button variant="secondary" onClick={() => modifyImage(invertPixels)}>Invert Pixels</Button>
-                </Col>
-                <Col>
-                    <Button variant="secondary" onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</Button>
-                </Col>
-
-                <Col>
-                    <Button variant="secondary" onClick={() => modifyImage(flipVertically)}>Flip vertically</Button>
-
-                </Col>
-            </Row>
 
             <Row>
                 <Form.Group>
@@ -388,6 +389,7 @@ const ModifyImage: React.FC = () => {
                                 step={0.1}
                                 onChange={(e) => setAlpha(Number(e.target.value))}
                             />
+
                         </Col>
                         <Col>
                             <Form.Label>Beta (β):</Form.Label>
@@ -396,6 +398,13 @@ const ModifyImage: React.FC = () => {
                                 defaultValue={beta}
                                 onChange={(e) => setBeta(Number(e.target.value))}
                             />
+                        </Col>
+                        <Col>
+                            <Row className="">
+                                <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doLinearMapping(image, alpha, beta))}>
+                                    Linear mapping <br />m(u)=αu+β
+                                </Button>
+                            </Row>
                         </Col>
                         <Col>
                             <Form.Label>Gamma (γ):</Form.Label>
@@ -407,11 +416,6 @@ const ModifyImage: React.FC = () => {
                             />
                         </Col>
                         <Col>
-                            <Row className="mb-1">
-                                <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doLinearMapping(image, alpha, beta))}>
-                                    Linear mapping <br />m(u)=αu+β
-                                </Button>
-                            </Row>
                             <Row className="">
                                 <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doPowerLawMapping(image, gamma))}>
                                     Power law mapping <br /> m(u)=(L-)[u/(L-1)]^γ
@@ -423,7 +427,7 @@ const ModifyImage: React.FC = () => {
                 </Form.Group>
 
             </Row >
-            <Row>
+            <Row className="align-items-center">
                 <Col>
                     <Form>
                         <Form.Group>
@@ -433,14 +437,16 @@ const ModifyImage: React.FC = () => {
                     </Form>
                 </Col>
                 <Col>
-                    <Button variant="secondary" onClick={() => modifyImage(gaussianBlur)}>Perform gaussian blur</Button>
+                    <Button variant="secondary" onClick={() => console.log("todo")}>Perform Convolution</Button>
+
                 </Col>
-                <Col>
-                    <Button variant="secondary" onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</Button>
-                </Col>
+
             </Row>
 
             <Row>
+                <Col>
+                    <Button variant="secondary" onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</Button>
+                </Col>
                 <Col>
                     <Button variant="info" onClick={() => modifyImage(plotFrequencyHistogram)}>Compute frequency histogram</Button>
                 </Col>
