@@ -57,6 +57,12 @@ const ModifyImage: React.FC = () => {
     const [alpha, setAlpha] = useState(1);
     const [beta, setBeta] = useState(0);
     const [gamma, setGamma] = useState(1);
+    const defaultKernel = [
+        [1 / 16, 1 / 8, 1 / 16],
+        [1 / 8, 1 / 4, 1 / 8],
+        [1 / 16, 1 / 8, 1 / 16],
+    ]
+    const [kernl, setKernel] = useState<number[][]>(defaultKernel);
 
 
     useEffect(() => {
@@ -151,6 +157,49 @@ const ModifyImage: React.FC = () => {
         setAltImage(plot)
     }
 
+    function createMatrixFromString(input: string): number[][] {
+        const rows = input.trim().split("\n");
+
+        // Check that all rows have the same number of elements
+        const rowLength = rows[0].trim().split(" ").length;
+        const isValidLength = rows.every(row => row.trim().split(" ").length === rowLength);
+        if (!isValidLength) {
+            return [];
+        }
+
+        const matrix = rows.map(row => {
+            const elements = row.trim().split(" ");
+            const rowValues = elements.map(Number);
+
+            // Check that all elements in a row are valid numbers
+            const isValidRow = rowValues.every(value => !isNaN(value));
+            if (!isValidRow) {
+                return [];
+            }
+
+            return rowValues;
+        });
+
+        // Check that all rows have the same number of elements
+        const isValidMatrix = matrix.every(row => row.length === rowLength);
+        if (!isValidMatrix) {
+            return [];
+        }
+
+        return matrix;
+    }
+
+    function setMatrixFromString(input: string) {
+        const matrix = createMatrixFromString(input);
+        if (matrix.length > 0 && matrix[0].length > 0) {
+            setKernel(matrix);
+            console.log("setd")
+        }
+    }
+
+    function matrixToString(matrix: number[][]): string {
+        return matrix.map(row => row.join(" ")).join("\n");
+    }
 
     return (
         <Container>
@@ -375,6 +424,14 @@ const ModifyImage: React.FC = () => {
 
             </Row >
             <Row>
+                <Col>
+                    <Form>
+                        <Form.Group>
+                            <Form.Label>Convolution Kernel</Form.Label>
+                            <Form.Control as="textarea" rows={3} defaultValue={matrixToString(defaultKernel)} onChange={(e) => { setMatrixFromString(e.target.value) }} />
+                        </Form.Group>
+                    </Form>
+                </Col>
                 <Col>
                     <Button variant="secondary" onClick={() => modifyImage(gaussianBlur)}>Perform gaussian blur</Button>
                 </Col>
