@@ -249,6 +249,12 @@ export const ScaleOptions = {
     NEAREST: 2,
 }
 
+export const IndexingOptions = {
+    REFLECTIVE: 0,
+    CIRCULAR: 1,
+    ZERO: 2,
+}
+
 function doBilinearInterpolation(pixelImage: PixelImage, i: number, j: number): Pixel {
     // get float coordinates
     const originalI = boundNumber(i, 0, pixelImage.getHeight() - 1)

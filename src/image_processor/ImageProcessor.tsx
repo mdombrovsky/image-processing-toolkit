@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
@@ -62,7 +62,10 @@ const ModifyImage: React.FC = () => {
         [1 / 8, 1 / 4, 1 / 8],
         [1 / 16, 1 / 8, 1 / 16],
     ]
-    const [kernl, setKernel] = useState<number[][]>(defaultKernel);
+    const [kernel, setKernel] = useState<number[][]>(defaultKernel);
+    const [indexingOption, setIndexingOption] = useState(IndexingOptions.REFLECTIVE);
+    const [rotateWithPadding, setRotateWithPadding] = useState(true);
+
 
 
     useEffect(() => {
@@ -338,6 +341,26 @@ const ModifyImage: React.FC = () => {
                     <Form.Group>
                         <Form.Check
                             type="radio"
+                            name="rotateOption"
+                            id="padding"
+                            label="Rotate with padding"
+                            checked={rotateWithPadding === true}
+                            onChange={() => setRotateWithPadding(true)}
+                        />
+                        <Form.Check
+                            type="radio"
+                            name="rotateOption"
+                            id="crop"
+                            label="Rotate with crop"
+                            checked={rotateWithPadding === false}
+                            onChange={() => setRotateWithPadding(false)}
+                        />
+                    </Form.Group>
+                </Col>
+                <Col className="aligh-items-center">
+                    <Form.Group>
+                        <Form.Check
+                            type="radio"
                             name="scaleOption"
                             id="bicubic"
                             label="Bicubic interpolation"
@@ -435,6 +458,34 @@ const ModifyImage: React.FC = () => {
                             <Form.Control as="textarea" rows={3} defaultValue={matrixToString(defaultKernel)} onChange={(e) => { setMatrixFromString(e.target.value) }} />
                         </Form.Group>
                     </Form>
+                </Col>
+                <Col className="aligh-items-center">
+                    <Form.Group>
+                        <Form.Check
+                            type="radio"
+                            name="indexingOption"
+                            id="reflective"
+                            label="Reflective Indexing"
+                            checked={indexingOption === IndexingOptions.REFLECTIVE}
+                            onChange={() => setIndexingOption(IndexingOptions.REFLECTIVE)}
+                        />
+                        <Form.Check
+                            type="radio"
+                            name="indexingOption"
+                            id="circular"
+                            label="Circular indexing"
+                            checked={indexingOption === IndexingOptions.CIRCULAR}
+                            onChange={() => setIndexingOption(IndexingOptions.CIRCULAR)}
+                        />
+                        <Form.Check
+                            type="radio"
+                            name="indexingOption"
+                            id="zero"
+                            label="Zero padding"
+                            checked={indexingOption === IndexingOptions.ZERO}
+                            onChange={() => setIndexingOption(IndexingOptions.ZERO)}
+                        />
+                    </Form.Group>
                 </Col>
                 <Col>
                     <Button variant="secondary" onClick={() => console.log("todo")}>Perform Convolution</Button>
