@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect, ReactElement } from "react";
 import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Accordion, Button, Col, Container, Form, Row } from 'react-bootstrap';
+import RangeSlider from 'react-bootstrap-range-slider';
 
 function getPixelImageFromImageData(imageData: ImageData): PixelImage {
     const tempPixels: Pixel[][] = []
@@ -65,6 +66,10 @@ const ModifyImage: React.FC = () => {
     const [kernel, setKernel] = useState<number[][]>(defaultKernel);
     const [indexingOption, setIndexingOption] = useState(IndexingOptions.REFLECTIVE);
     const [rotateWithPadding, setRotateWithPadding] = useState(true);
+    const [red, setRed] = useState(155);
+    const [green, setGreen] = useState(0);
+    const [blue, setBlue] = useState(0);
+
 
 
 
@@ -249,7 +254,6 @@ const ModifyImage: React.FC = () => {
                         </Accordion.Header>
                         <Accordion.Body>
                             <Row className="align-items-center">
-
                                 <Col>
                                     <Form.Group>
                                         <Row className="align-items-center">
@@ -323,7 +327,7 @@ const ModifyImage: React.FC = () => {
                                                     />
                                                 </Col>
                                                 <Col>
-                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount))}>rotate</Button>
+                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount, red, green, blue))}>rotate</Button>
                                                 </Col>
                                             </Row>
                                         </Form.Group>
@@ -346,25 +350,43 @@ const ModifyImage: React.FC = () => {
                                         </Form.Group>
                                     </Row>
                                 </Col>
-                                <Col className="aligh-items-center">
-                                    <Form.Group>
-                                        <Form.Check
-                                            type="radio"
-                                            name="rotateOption"
-                                            id="padding"
-                                            label="Rotate with padding"
-                                            checked={rotateWithPadding === true}
-                                            onChange={() => setRotateWithPadding(true)}
+                                <Col
+                                    style={{
+                                        backgroundColor: `rgb(${red}, ${green}, ${blue})`,
+                                    }}
+                                >
+                                    <Row style={{
+                                        backgroundColor: `rgb(255,255,255)`,
+                                    }}>
+                                        <Form.Label>Padding Color Picker</Form.Label>
+                                    </Row>
+                                    <Row>
+                                        <RangeSlider
+                                            value={red}
+                                            min={0}
+                                            max={255}
+                                            onChange={e => { setRed(e.target.valueAsNumber) }}
+                                            tooltipLabel={(value) => `Red: ${value}`}
                                         />
-                                        <Form.Check
-                                            type="radio"
-                                            name="rotateOption"
-                                            id="crop"
-                                            label="Rotate with crop"
-                                            checked={rotateWithPadding === false}
-                                            onChange={() => setRotateWithPadding(false)}
+                                    </Row>
+                                    <Row>
+                                        <RangeSlider
+                                            value={green}
+                                            min={0}
+                                            max={255}
+                                            onChange={e => { setGreen(e.target.valueAsNumber) }}
+                                            tooltipLabel={(value) => `Green: ${value}`}
                                         />
-                                    </Form.Group>
+                                    </Row>
+                                    <Row>
+                                        <RangeSlider
+                                            value={blue}
+                                            min={0}
+                                            max={255}
+                                            onChange={e => { setBlue(e.target.valueAsNumber) }}
+                                            tooltipLabel={(value) => `Blue: ${value}`}
+                                        />
+                                    </Row>
                                 </Col>
                                 <Col className="aligh-items-center">
                                     <Form.Group>

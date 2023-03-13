@@ -161,7 +161,7 @@ function multiplyMatrices(a: number[][], b: number[][]): number[][] {
 }
 
 
-export function rotate(pixelImage: PixelImage, degrees: number = 3) {
+export function rotate(pixelImage: PixelImage, degrees: number = 3, r: number, g: number, b: number) {
     const pixels = pixelImage.pixels
     const radians = (degrees) * (Math.PI / 180)
     const sin = Math.sin(radians)
@@ -193,7 +193,7 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3) {
             const oldJ = Math.round(oldJBad * 2) / 2.0 - 0.5
 
             if (oldI < 0 || oldJ < 0 || oldI >= pixelImage.getHeight() || oldJ >= pixelImage.getWidth()) {
-                newRow.push(new Pixel(155, 0, 0))
+                newRow.push(new Pixel(r, g, b))
 
             } else {
                 const newPixel = doNearestNeighbourInterpolation(pixelImage, oldI, oldJ)
