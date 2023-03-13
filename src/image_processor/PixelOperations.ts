@@ -180,7 +180,7 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType:
         case ScaleOptions.BILINEAR:
             interpolation = doBilinearInterpolation
             break
-        case ScaleOptions.BICUBIC:
+        case ScaleOptions.NEAREST:
             interpolation = doNearestNeighbourInterpolation
             break
         default:
@@ -319,32 +319,29 @@ export function scaleImage(pixelImage: PixelImage, scale: number, type: number) 
     const newWidth = pixelImage.getWidth() * scale
     const newHeight = pixelImage.getHeight() * scale
 
-    console.log(type)
-    const newPixels: Pixel[][] = []
-    switch (type) {
-        case ScaleOptions.NEAREST:
-            for (var i = 0; i < newHeight; i++) {
-                const newRow: Pixel[] = []
-                for (var j = 0; j < newWidth; j++) {
-                    newRow.push(doNearestNeighbourInterpolation(pixelImage, i / scale, j / scale))
-                }
-                newPixels.push(newRow)
-            }
-            break;
-        case ScaleOptions.BILINEAR:
-            for (var i = 0; i < newHeight; i++) {
-                const newRow: Pixel[] = []
-                for (var j = 0; j < newWidth; j++) {
-                    newRow.push(doBilinearInterpolation(pixelImage, i / scale, j / scale))
-                }
-                newPixels.push(newRow)
-            }
-            break;
-        default:
-            alert("not implemented yet")
-            return
+    let interpolation: (image: PixelImage, i: number, j: number) => Pixel;
 
+    switch (type) {
+        case ScaleOptions.BILINEAR:
+            interpolation = doBilinearInterpolation
+            break
+        case ScaleOptions.NEAREST:
+            interpolation = doNearestNeighbourInterpolation
+            break
+        default:
+            alert("Unsupported scaling type")
+            throw new Error("Rotation scale error")
     }
+
+    const newPixels: Pixel[][] = []
+    for (var i = 0; i < newHeight; i++) {
+        const newRow: Pixel[] = []
+        for (var j = 0; j < newWidth; j++) {
+            newRow.push(interpolation(pixelImage, i / scale, j / scale))
+        }
+        newPixels.push(newRow)
+    }
+
     pixelImage.overwrite(newPixels, newPixels[0].length, newPixels.length)
 }
 
