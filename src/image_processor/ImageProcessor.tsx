@@ -327,7 +327,7 @@ const ModifyImage: React.FC = () => {
                                                     />
                                                 </Col>
                                                 <Col>
-                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount, red, green, blue))}>rotate</Button>
+                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount, scaleOption, red, green, blue))}>rotate</Button>
                                                 </Col>
                                             </Row>
                                         </Form.Group>

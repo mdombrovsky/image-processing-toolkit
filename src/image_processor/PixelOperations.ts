@@ -161,7 +161,7 @@ function multiplyMatrices(a: number[][], b: number[][]): number[][] {
 }
 
 
-export function rotate(pixelImage: PixelImage, degrees: number = 3, r: number, g: number, b: number) {
+export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType: number, r: number, g: number, b: number) {
     const pixels = pixelImage.pixels
     const radians = (degrees) * (Math.PI / 180)
     const sin = Math.sin(radians)
@@ -174,6 +174,19 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3, r: number, g
     const hDiff = Math.abs(newHeight - oldHeight)
     const wDiff = Math.abs(newWidth - oldWidth)
 
+    let interpolation: (image: PixelImage, i: number, j: number) => Pixel;
+
+    switch (scalingType) {
+        case ScaleOptions.BILINEAR:
+            interpolation = doBilinearInterpolation
+            break
+        case ScaleOptions.BICUBIC:
+            interpolation = doNearestNeighbourInterpolation
+            break
+        default:
+            alert("Unsupported scaling type")
+            throw new Error("Rotation scale error")
+    }
 
     const newPixels: Pixel[][] = []
 
@@ -196,7 +209,7 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3, r: number, g
                 newRow.push(new Pixel(r, g, b))
 
             } else {
-                const newPixel = doNearestNeighbourInterpolation(pixelImage, oldI, oldJ)
+                const newPixel = interpolation(pixelImage, oldI, oldJ)
                 newRow.push(newPixel)
             }
         }
