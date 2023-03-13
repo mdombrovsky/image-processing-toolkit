@@ -69,6 +69,7 @@ const ModifyImage: React.FC = () => {
     const [red, setRed] = useState(155);
     const [green, setGreen] = useState(0);
     const [blue, setBlue] = useState(0);
+    const [validKernel, setValidKernel] = useState(true);
 
 
 
@@ -166,6 +167,10 @@ const ModifyImage: React.FC = () => {
     }
 
     function createMatrixFromString(input: string): number[][] {
+        if (input.trim() == "") {
+            return [];
+        }
+
         const rows = input.trim().split("\n");
 
         // Check that all rows have the same number of elements
@@ -199,9 +204,13 @@ const ModifyImage: React.FC = () => {
 
     function setMatrixFromString(input: string) {
         const matrix = createMatrixFromString(input);
+        console.log(matrix)
+
         if (matrix.length > 0 && matrix[0].length > 0) {
             setKernel(matrix);
-            console.log("setd")
+            setValidKernel(true);
+        } else {
+            setValidKernel(false);
         }
     }
 
@@ -500,6 +509,11 @@ const ModifyImage: React.FC = () => {
                                         <Form.Group>
                                             <Form.Label>Convolution Kernel</Form.Label>
                                             <Form.Control as="textarea" rows={3} defaultValue={matrixToString(defaultKernel)} onChange={(e) => { setMatrixFromString(e.target.value) }} />
+                                            {validKernel ? (
+                                                <Form.Text className="text-success">Kernel is valid</Form.Text>
+                                            ) : (
+                                                <Form.Text className="text-danger">Kernel is invalid</Form.Text>
+                                            )}
                                         </Form.Group>
                                     </Form>
                                 </Col>
@@ -532,7 +546,7 @@ const ModifyImage: React.FC = () => {
                                     </Form.Group>
                                 </Col>
                                 <Col>
-                                    <Button variant="secondary" onClick={() => console.log("todo")}>Perform Convolution</Button>
+                                    <Button variant="secondary" disabled={!validKernel} onClick={() => console.log("todo")}>Perform Convolution</Button>
 
                                 </Col>
                             </Row>
