@@ -355,10 +355,24 @@ export function gaussianBlur(pixelImage: PixelImage) {
         [1 / 16, 1 / 8, 1 / 16],
     ];
 
-    performConvolution(pixelImage.pixels, kernel)
+    performConvolution(pixelImage, kernel, IndexingOptions.REFLECTIVE)
 }
 
-function performConvolution(pixels: Pixel[][], kernel: number[][]) {
+function doZeroIndexing(pixels: Pixel[][], i: number, j: number): Pixel {
+    return (i >= 0 && j >= 0 && i < pixels.length && j < pixels[0].length) ? pixels[i][j] : new Pixel(0, 0, 0)
+}
+
+function doReflectiveIndexing(pixels: Pixel[][], i: number, j: number): Pixel {
+    const length = pixels.length
+    const width = pixels[0].length
+    const reflectedI = ((i % (length * 2)) + (length * 2)) % (length * 2)
+    const reflectedJ = ((j % (width * 2)) + (width * 2)) % (width * 2)
+
+    return pixels[reflectedI >= length ? (length * 2 - 1) - reflectedI : reflectedI][reflectedJ >= width ? (width * 2 - 1) - reflectedJ : reflectedJ];
+}
+
+export function performConvolution(pixelImage: PixelImage, kernel: number[][], type: number) {
+    const pixels = pixelImage.pixels;
     const flippedKernel = getFlippedKernel(kernel)
     const height = pixels.length
     const width = pixels[0].length
@@ -367,15 +381,28 @@ function performConvolution(pixels: Pixel[][], kernel: number[][]) {
     const kIAdjustment = Math.floor(kHeight / 2)
     const kJAdjustment = Math.floor(kWidth / 2)
 
+    let doIndexing: (pixels: Pixel[][], i: number, j: number) => Pixel;
+    switch (type) {
+        case IndexingOptions.REFLECTIVE:
+            doIndexing = doReflectiveIndexing;
+            break;
+        case IndexingOptions.ZERO:
+            doIndexing = doZeroIndexing;
+            break;
+        default:
+            alert("Unsupported indexing type")
+            throw new Error("Unknown indexing type");
+    }
+
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
             let r = 0, g = 0, b = 0
             for (let kI = 0; kI < kHeight; kI++) {
                 for (let kJ = 0; kJ < kWidth; kJ++) {
-                    // transformed indecies
+                    // transformed indicies
                     const tI = i + kI - kIAdjustment
                     const tJ = j + kJ - kJAdjustment
-                    const pixel = (tI >= 0 && tJ >= 0 && tI < height && tJ < width) ? pixels[tI][tJ] : pixels[i][j]
+                    const pixel = doIndexing(pixels, tI, tJ)
                     const kernelValue = flippedKernel[kI][kJ]
                     r += pixel.red * kernelValue
                     g += pixel.green * kernelValue
