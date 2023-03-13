@@ -397,7 +397,7 @@ const ModifyImage: React.FC = () => {
                                         />
                                     </Row>
                                 </Col>
-                                <Col className="aligh-items-center">
+                                <Col className="align-items-center">
                                     <Form.Group>
                                         <Form.Check
                                             type="radio"
@@ -517,37 +517,43 @@ const ModifyImage: React.FC = () => {
                                         </Form.Group>
                                     </Form>
                                 </Col>
-                                <Col className="aligh-items-center">
+                                <Col className="text-start">
                                     <Form.Group>
-                                        <Form.Check
-                                            type="radio"
-                                            name="indexingOption"
-                                            id="reflective"
-                                            label="Reflective Indexing"
-                                            checked={indexingOption === IndexingOptions.REFLECTIVE}
-                                            onChange={() => setIndexingOption(IndexingOptions.REFLECTIVE)}
-                                        />
-                                        <Form.Check
-                                            type="radio"
-                                            name="indexingOption"
-                                            id="circular"
-                                            label="Circular indexing"
-                                            checked={indexingOption === IndexingOptions.CIRCULAR}
-                                            onChange={() => setIndexingOption(IndexingOptions.CIRCULAR)}
-                                        />
-                                        <Form.Check
-                                            type="radio"
-                                            name="indexingOption"
-                                            id="zero"
-                                            label="Zero padding"
-                                            checked={indexingOption === IndexingOptions.ZERO}
-                                            onChange={() => setIndexingOption(IndexingOptions.ZERO)}
-                                        />
+                                        <Row>
+                                            <Form.Check
+                                                type="radio"
+                                                name="indexingOption"
+                                                id="reflective"
+                                                label="Reflective Indexing"
+                                                checked={indexingOption === IndexingOptions.REFLECTIVE}
+                                                onChange={() => setIndexingOption(IndexingOptions.REFLECTIVE)}
+                                            />
+                                        </Row>
+                                        <Row>
+                                            <Form.Check
+                                                type="radio"
+                                                name="indexingOption"
+                                                id="circular"
+                                                label="Circular indexing"
+                                                checked={indexingOption === IndexingOptions.CIRCULAR}
+                                                onChange={() => setIndexingOption(IndexingOptions.CIRCULAR)}
+                                            />
+                                        </Row>
+                                        <Row>
+                                            <Form.Check
+                                                type="radio"
+                                                name="indexingOption"
+                                                id="zero"
+                                                label="Zero padding"
+                                                checked={indexingOption === IndexingOptions.ZERO}
+                                                onChange={() => setIndexingOption(IndexingOptions.ZERO)}
+                                            />
+                                        </Row>
+
                                     </Form.Group>
                                 </Col>
                                 <Col>
                                     <Button variant="secondary" disabled={!validKernel} onClick={() => console.log("todo")}>Perform Convolution</Button>
-
                                 </Col>
                             </Row>
                         </Accordion.Body>
