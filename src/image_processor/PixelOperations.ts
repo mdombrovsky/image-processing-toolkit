@@ -178,14 +178,19 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3) {
     const newPixels: Pixel[][] = []
 
     // Shift up and left so that center is at 0,0
-    const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, oldHeight / 2, oldWidth / 2)
+    const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, oldHeight / 2.0, oldWidth / 2.0)
+
+    const iIteration = newHeight / 2.0 - 0.5;
+    const jIteration = newWidth / 2.0 - 0.5;
 
     // Re-create image treating 0,0 as new center
-    for (var i = -newHeight / 2; i < newHeight / 2; i++) {
+    for (var i = -iIteration; i <= iIteration; i++) {
         const newRow: Pixel[] = []
-        for (var j = -newWidth / 2; j < newWidth / 2; j++) {
+        for (var j = -jIteration; j <= jIteration; j++) {
             const res = multiplyMatrices(inverseRoationMatrix, [[i], [j], [1]])
-            const [[oldI], [oldJ]] = res
+            const [[oldIBad], [oldJBad]] = res
+            const oldI = Math.round(oldIBad * 2) / 2.0 - 0.5
+            const oldJ = Math.round(oldJBad * 2) / 2.0 - 0.5
 
             if (oldI < 0 || oldJ < 0 || oldI >= pixelImage.getHeight() || oldJ >= pixelImage.getWidth()) {
                 newRow.push(new Pixel(155, 0, 0))
