@@ -313,6 +313,39 @@ function doNearestNeighbourInterpolation(pixelImage: PixelImage, i: number, j: n
     return pixelImage.pixels[boundNumber(Math.round(i), 0, pixelImage.pixels.length - 1)][boundNumber(Math.round(j), 0, pixelImage.pixels[0].length - 1)].copyFrom()
 }
 
+export function doIndexing(pixelImage: PixelImage, scale: number, type: number) {
+    let doIndexing: (pixels: Pixel[][], i: number, j: number) => Pixel;
+    switch (type) {
+        case IndexingOptions.REFLECTIVE:
+            doIndexing = doReflectiveIndexing;
+            break;
+        case IndexingOptions.ZERO:
+            doIndexing = doZeroIndexing;
+            break;
+        default:
+            alert("Unsupported indexing type")
+            throw new Error("Unknown indexing type");
+    }
+
+    const height = pixelImage.getHeight()
+    const width = pixelImage.getWidth()
+    const newHeight = height * scale
+    const newWidth = width * scale
+    const hDiff = Math.abs(Math.round((newHeight - height) / 2.0))
+    const wDiff = Math.abs(Math.round((newWidth - width) / 2.0))
+
+
+    const newPixels: Pixel[][] = []
+    for (let i = -hDiff; i < height + hDiff; i++) {
+        const newRow: Pixel[] = []
+        for (let j = -wDiff; j < width + wDiff; j++) {
+            newRow.push(doIndexing(pixelImage.pixels, i, j))
+        }
+        newPixels.push(newRow)
+    }
+
+    pixelImage.overwrite(newPixels, newPixels[0].length, newPixels.length)
+}
 export function scaleImage(pixelImage: PixelImage, scale: number, type: number) {
     const pixels = pixelImage.pixels
 

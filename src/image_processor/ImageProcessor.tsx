@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doIndexing, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Accordion, Button, Col, Container, Form, Row } from 'react-bootstrap';
 import RangeSlider from 'react-bootstrap-range-slider';
@@ -70,6 +70,7 @@ const ModifyImage: React.FC = () => {
     const [green, setGreen] = useState(0);
     const [blue, setBlue] = useState(0);
     const [validKernel, setValidKernel] = useState(true);
+    const [indexingScale, setIndexingScale] = useState(1);
 
 
 
@@ -500,7 +501,7 @@ const ModifyImage: React.FC = () => {
                     </Accordion.Item>
                     <Accordion.Item eventKey='convolutions'>
                         <Accordion.Header>
-                            Convolutions
+                            Convolutions and Indexing
                         </Accordion.Header>
                         <Accordion.Body>
                             <Row className="align-items-center">
@@ -524,7 +525,7 @@ const ModifyImage: React.FC = () => {
                                                 type="radio"
                                                 name="indexingOption"
                                                 id="reflective"
-                                                label="Reflective Indexing"
+                                                label="Reflective indexing"
                                                 checked={indexingOption === IndexingOptions.REFLECTIVE}
                                                 onChange={() => setIndexingOption(IndexingOptions.REFLECTIVE)}
                                             />
@@ -552,9 +553,29 @@ const ModifyImage: React.FC = () => {
 
                                     </Form.Group>
                                 </Col>
+
                                 <Col>
+
                                     <Button variant="secondary" disabled={!validKernel} onClick={() => modifyImage((pixels: PixelImage) => performConvolution(pixels, kernel, indexingOption))}>Perform Convolution</Button>
                                 </Col>
+                                <Col>
+                                    <Form.Group>
+                                        <Row className="align-items-center">
+                                            <Col>
+                                                <Form.Label>Scale Via Indexing:</Form.Label>
+                                                <Form.Control
+                                                    type="number"
+                                                    defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setIndexingScale(Number(e.target.value))}
+                                                />
+                                            </Col>
+                                            <Col>
+                                                <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => doIndexing(pixels, indexingScale, indexingOption))}>Scale via Indexing</Button>
+
+                                            </Col>
+                                        </Row>
+                                    </Form.Group>
+                                </Col>
+
                             </Row>
                         </Accordion.Body>
                     </Accordion.Item>
