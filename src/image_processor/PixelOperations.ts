@@ -322,6 +322,9 @@ export function doIndexing(pixelImage: PixelImage, scale: number, type: number) 
         case IndexingOptions.ZERO:
             doIndexing = doZeroIndexing;
             break;
+        case IndexingOptions.CIRCULAR:
+            doIndexing = doCircularIndexing
+            break;
         default:
             alert("Unsupported indexing type")
             throw new Error("Unknown indexing type");
@@ -401,6 +404,15 @@ function doReflectiveIndexing(pixels: Pixel[][], i: number, j: number): Pixel {
     return pixels[reflectedI >= length ? (length * 2 - 1) - reflectedI : reflectedI][reflectedJ >= width ? (width * 2 - 1) - reflectedJ : reflectedJ];
 }
 
+function doCircularIndexing(pixels: Pixel[][], i: number, j: number): Pixel {
+    const height = pixels.length
+    const width = pixels[0].length
+    const circularI = i < 0 ? height - 1 - ((-i - 1) % height) : i % height
+    const circularJ = j < 0 ? width - 1 - ((-j - 1) % width) : j % width
+
+    return pixels[circularI][circularJ]
+}
+
 export function performConvolution(pixelImage: PixelImage, kernel: number[][], type: number) {
     const pixels = pixelImage.pixels;
     const flippedKernel = getFlippedKernel(kernel)
@@ -418,6 +430,9 @@ export function performConvolution(pixelImage: PixelImage, kernel: number[][], t
             break;
         case IndexingOptions.ZERO:
             doIndexing = doZeroIndexing;
+            break;
+        case IndexingOptions.CIRCULAR:
+            doIndexing = doCircularIndexing
             break;
         default:
             alert("Unsupported indexing type")
