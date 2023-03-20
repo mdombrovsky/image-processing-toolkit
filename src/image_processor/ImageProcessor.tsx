@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doIndexing, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doIndexing, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Accordion, Button, Col, Container, Form, Row } from 'react-bootstrap';
 import RangeSlider from 'react-bootstrap-range-slider';
@@ -71,8 +71,7 @@ const ModifyImage: React.FC = () => {
     const [blue, setBlue] = useState(0);
     const [validKernel, setValidKernel] = useState(true);
     const [indexingScale, setIndexingScale] = useState(1);
-
-
+    const [boundingOption, setBoundingOption] = useState(BoundingOptions.CUT_OFF)
 
 
     useEffect(() => {
@@ -517,6 +516,30 @@ const ModifyImage: React.FC = () => {
                                             )}
                                         </Form.Group>
                                     </Form>
+                                </Col>
+                                <Col className="text-start">
+                                    <Form.Group>
+                                        <Row>
+                                            <Form.Check
+                                                type="radio"
+                                                name="boundingOption"
+                                                id="cut_off"
+                                                label="Cut off out of bounds"
+                                                checked={boundingOption === BoundingOptions.CUT_OFF}
+                                                onChange={() => setBoundingOption(BoundingOptions.CUT_OFF)}
+                                            />
+                                        </Row>
+                                        <Row>
+                                            <Form.Check
+                                                type="radio"
+                                                name="boundingOption"
+                                                id="normalize_values"
+                                                label="Normalize values to 0..255"
+                                                checked={boundingOption === BoundingOptions.NORMALIZE}
+                                                onChange={() => setBoundingOption(BoundingOptions.NORMALIZE)}
+                                            />
+                                        </Row>
+                                    </Form.Group>
                                 </Col>
                                 <Col className="text-start">
                                     <Form.Group>
