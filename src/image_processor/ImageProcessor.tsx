@@ -41,11 +41,11 @@ function getImageCanvasFromPixelImage(pixelImage: PixelImage): HTMLCanvasElement
 
 const ModifyImage: React.FC = () => {
     const defaultImage = bars
-    const defaultAltImage = <div />
+    const defaultAltImage = null
     const [loadedImage, setLoadedImage] = useState(defaultImage)
     const [image, setImage] = useState(loadedImage);
     const imageRef = useRef<HTMLImageElement>(null);
-    const [altImage, setAltImage] = useState<ReactElement>(defaultAltImage);
+    const [altImage, setAltImage] = useState<ReactElement | null>(defaultAltImage);
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [rotateAmount, setRotateAmount] = useState(45);
@@ -245,14 +245,8 @@ const ModifyImage: React.FC = () => {
                                 setAltImage(defaultAltImage)
                             }}>Reset</Button>
                         </Col>
-                        <Col>
-                            <Button variant="warning" onClick={() => setAltImage(defaultAltImage)}>Hide secondary display</Button>
-                        </Col>
                     </Row>
                 </Col>
-            </Row>
-            <Row>
-                {altImage}
             </Row>
             <Row className="align-items-center">
                 <Accordion alwaysOpen>
@@ -608,6 +602,9 @@ const ModifyImage: React.FC = () => {
                         </Accordion.Header>
                         <Accordion.Body>
                             <Row>
+                                {altImage}
+                            </Row>
+                            <Row>
                                 <Col>
                                     <Button variant="secondary" onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</Button>
                                 </Col>
@@ -616,6 +613,9 @@ const ModifyImage: React.FC = () => {
                                 </Col>
                                 <Col>
                                     <Button variant="info" onClick={() => modifyImage(plotCumulativeNormalizedHistogram)}>Compute cumulative normalized histogram</Button>
+                                </Col>
+                                <Col>
+                                    <Button variant="warning" onClick={() => setAltImage(defaultAltImage)} disabled={altImage == null}>Hide secondary display</Button>
                                 </Col>
                             </Row>
                         </Accordion.Body>
