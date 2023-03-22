@@ -573,7 +573,7 @@ const ModifyImage: React.FC = () => {
 
                                 <Col>
 
-                                    <Button variant="secondary" disabled={!validKernel} onClick={() => modifyImage((pixels: PixelImage) => performConvolution(pixels, kernel, indexingOption))}>Perform Convolution</Button>
+                                    <Button variant="secondary" disabled={!validKernel} onClick={() => modifyImage((pixels: PixelImage) => performConvolution(pixels, kernel, indexingOption, boundingOption))}>Perform Convolution</Button>
                                 </Col>
                                 <Col>
                                     <Form.Group>

@@ -442,6 +442,7 @@ export function performConvolution(pixelImage: PixelImage, kernel: number[][], i
     const kWidth = flippedKernel[0].length
     const kIAdjustment = Math.floor(kHeight / 2)
     const kJAdjustment = Math.floor(kWidth / 2)
+    const pixelCount = width * height
 
     let doIndexing: (pixels: Pixel[][], i: number, j: number) => Pixel;
     switch (indexingType) {
@@ -459,7 +460,15 @@ export function performConvolution(pixelImage: PixelImage, kernel: number[][], i
             throw new Error("Unknown indexing type");
     }
 
-
+    const rVals: number[] = new Array(pixelCount)
+    const gVals: number[] = new Array(pixelCount)
+    const bVals: number[] = new Array(pixelCount)
+    let rMin = Infinity
+    let rMax = -Infinity
+    let gMin = Infinity
+    let gMax = -Infinity
+    let bMin = Infinity
+    let bMax = -Infinity
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
             let r = 0, g = 0, b = 0
@@ -475,14 +484,40 @@ export function performConvolution(pixelImage: PixelImage, kernel: number[][], i
                     b += pixel.blue * kernelValue
                 }
             }
-            // console.log(r, g, b)
-            pixels[i][j].overwrite(boundNumber(r, 0, 255), boundNumber(g, 0, 255), boundNumber(b, 0, 255))
-            // not sure if i should wrap these values
-            // pixels[i][j].overwrite(wrapOverflow(r, 255), wrapOverflow(g, 255), wrapOverflow(b, 255))
+            rMin = Math.min(rMin, r)
+            rMax = Math.max(rMax, r)
+            gMin = Math.min(gMin, g)
+            gMax = Math.max(gMax, g)
+            bMin = Math.min(bMin, b)
+            bMax = Math.max(bMax, b)
+            rVals.push(r)
+            gVals.push(g)
+            bVals.push(b)
         }
     }
 
+
+    for (let i = height - 1; i >= 0; i--) {
+        for (let j = width - 1; j >= 0; j--) {
+            const r: number = rVals.pop()!
+            const g: number = gVals.pop()!
+            const b: number = bVals.pop()!
+            if (boundingType == BoundingOptions.CUT_OFF) {
+                pixels[i][j].overwrite(boundNumber(r, 0, 255), boundNumber(g, 0, 255), boundNumber(b, 0, 255))
+            } else {
+                pixels[i][j].overwrite(normalizeToPixel(r, rMin, rMax), normalizeToPixel(g, gMin, gMax), normalizeToPixel(b, bMin, bMax))
+            }
+        }
+    }
 }
+
+function normalizeToPixel(result: number, min_result: number, max_result: number): number {
+    const range = max_result - min_result
+
+    return range == 0 ? Math.round(255 / 2) : Math.round(((result - min_result) / (range)) * 255);
+}
+
+
 function getFlippedKernel(kernel: number[][]): number[][] {
     const height = kernel.length
     const width = kernel[0].length
