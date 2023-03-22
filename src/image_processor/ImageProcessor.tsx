@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doIndexing, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doIndexing, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Accordion, Button, Col, Container, Form, Row } from 'react-bootstrap';
 import RangeSlider from 'react-bootstrap-range-slider';
@@ -72,7 +72,8 @@ const ModifyImage: React.FC = () => {
     const [validKernel, setValidKernel] = useState(true);
     const [indexingScale, setIndexingScale] = useState(1);
     const [boundingOption, setBoundingOption] = useState(BoundingOptions.CUT_OFF)
-
+    const [neighbourhoodOption, setNeighbourhoodOption] = useState(NeighbourhoodOptions.CHESS_BOARD)
+    const [neighbourhoodSize, setNeighbourhoodSize] = useState(1);
 
     useEffect(() => {
         const image_ = new Image();
@@ -620,13 +621,67 @@ const ModifyImage: React.FC = () => {
                             </Row>
                         </Accordion.Body>
                     </Accordion.Item>
+                    <Accordion.Item eventKey='filter'>
+                        <Accordion.Header>
+                            Filtering
+                        </Accordion.Header>
+                        <Accordion.Body>
+                            <Row>
+                                <Col>
+                                    <Row className="m-1">
+                                        <Button variant="secondary" onClick={() => modifyImage(() => { })}>Max filtering</Button>
+                                    </Row>
+                                    <Row className="m-1">
+                                        <Button variant="secondary" onClick={() => modifyImage(() => { })}>Median filtering</Button>
+                                    </Row>
+                                    <Row className="m-1">
+                                        <Button variant="secondary" onClick={() => modifyImage(() => { })}>Min filtering</Button>
+                                    </Row>
+                                </Col>
+                                <Col className="text-start">
+                                    <Form.Group>
+                                        <Row>
+                                            <Form.Label htmlFor="neighbourhoodSize">Neighboorhood Size:</Form.Label>
+                                            <Form.Control
+                                                type="number"
+                                                id="neighbourhoodSize"
+                                                name="Neighbourhood Size"
+                                                min={1}
+                                                defaultValue={1}
+                                                onChange={(e) => {
+                                                    const value = Math.max(1, Math.round(Number(e.target.value)));
+                                                    setNeighbourhoodSize(value)
+                                                }}
+                                                pattern="^[0-9]*$"
+                                            />
+                                        </Row>
+                                        <Row>
+                                            <Form.Check
+                                                type="radio"
+                                                name="neighbourhoodOption"
+                                                id="cityBlock"
+                                                label="City Block neighbourhood"
+                                                checked={neighbourhoodOption === NeighbourhoodOptions.CITY_BLOCK}
+                                                onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CITY_BLOCK)}
+                                            />
+                                        </Row>
+                                        <Row>
+                                            <Form.Check
+                                                type="radio"
+                                                name="neighbourhoodOption"
+                                                id="chessBoard"
+                                                label="Chess Board neighbourhood"
+                                                checked={neighbourhoodOption === NeighbourhoodOptions.CHESS_BOARD}
+                                                onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CHESS_BOARD)}
+                                            />
+                                        </Row>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                        </Accordion.Body>
+                    </Accordion.Item>
                 </Accordion>
-
             </Row >
-
-
-
-
         </Container >
     );
 };

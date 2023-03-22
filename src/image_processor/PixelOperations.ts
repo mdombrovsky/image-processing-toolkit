@@ -278,6 +278,11 @@ export const BoundingOptions = {
     NORMALIZE: 1,
 }
 
+export const NeighbourhoodOptions = {
+    CITY_BLOCK: 0,
+    CHESS_BOARD: 1,
+}
+
 function doBilinearInterpolation(pixelImage: PixelImage, i: number, j: number): Pixel {
     // get float coordinates
     const originalI = boundNumber(i, 0, pixelImage.getHeight() - 1)
