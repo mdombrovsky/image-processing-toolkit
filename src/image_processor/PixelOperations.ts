@@ -418,7 +418,7 @@ function doCircularIndexing(pixels: Pixel[][], i: number, j: number): Pixel {
     return pixels[circularI][circularJ]
 }
 
-export function performConvolution(pixelImage: PixelImage, kernel: number[][], type: number) {
+export function performConvolution(pixelImage: PixelImage, kernel: number[][], indexingType: number, boundingType: number = BoundingOptions.CUT_OFF) {
     const pixels = pixelImage.pixels;
     const flippedKernel = getFlippedKernel(kernel)
     const height = pixels.length
@@ -429,7 +429,7 @@ export function performConvolution(pixelImage: PixelImage, kernel: number[][], t
     const kJAdjustment = Math.floor(kWidth / 2)
 
     let doIndexing: (pixels: Pixel[][], i: number, j: number) => Pixel;
-    switch (type) {
+    switch (indexingType) {
         case IndexingOptions.REFLECTIVE:
             doIndexing = doReflectiveIndexing;
             break;
@@ -443,6 +443,7 @@ export function performConvolution(pixelImage: PixelImage, kernel: number[][], t
             alert("Unsupported indexing type")
             throw new Error("Unknown indexing type");
     }
+
 
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
@@ -459,7 +460,8 @@ export function performConvolution(pixelImage: PixelImage, kernel: number[][], t
                     b += pixel.blue * kernelValue
                 }
             }
-            pixels[i][j].overwrite(r, g, b)
+            // console.log(r, g, b)
+            pixels[i][j].overwrite(boundNumber(r, 0, 255), boundNumber(g, 0, 255), boundNumber(b, 0, 255))
             // not sure if i should wrap these values
             // pixels[i][j].overwrite(wrapOverflow(r, 255), wrapOverflow(g, 255), wrapOverflow(b, 255))
         }
