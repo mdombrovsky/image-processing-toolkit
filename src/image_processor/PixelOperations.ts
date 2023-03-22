@@ -418,6 +418,21 @@ function doCircularIndexing(pixels: Pixel[][], i: number, j: number): Pixel {
     return pixels[circularI][circularJ]
 }
 
+export function makeRed(pixelImage: PixelImage) {
+    const newWidth = 3;
+    const newHeight = 3;
+    const newPixels: Pixel[][] = []
+    for (var i = 0; i < newHeight; i++) {
+        const newRow: Pixel[] = []
+        for (var j = 0; j < newWidth; j++) {
+            newRow.push(new Pixel(255, 0, 0))
+        }
+        newPixels.push(newRow)
+    }
+
+    pixelImage.overwrite(newPixels, newPixels[0].length, newPixels.length)
+}
+
 export function performConvolution(pixelImage: PixelImage, kernel: number[][], indexingType: number, boundingType: number = BoundingOptions.CUT_OFF) {
     const pixels = pixelImage.pixels;
     const flippedKernel = getFlippedKernel(kernel)
