@@ -242,7 +242,7 @@ const ModifyImage: React.FC = () => {
                         <Col>
                             <Button variant="danger" onClick={() => {
                                 setImage(loadedImage)
-                                setAltImage(defaultAltImage)
+                                // setAltImage(defaultAltImage)
                             }}>Reset</Button>
                         </Col>
                     </Row>
