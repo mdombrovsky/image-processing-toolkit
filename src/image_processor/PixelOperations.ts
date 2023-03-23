@@ -53,6 +53,7 @@ function wrapOverflow(input: number, max: number) {
     return (input % (max + 1) + (max + 1)) % (max + 1)
 }
 
+
 export class PixelImage {
     pixels: Pixel[][]
     private width: number
@@ -281,6 +282,12 @@ export const BoundingOptions = {
 export const NeighbourhoodOptions = {
     CITY_BLOCK: 0,
     CHESS_BOARD: 1,
+}
+
+export const FilteringOptions = {
+    MIN: 0,
+    MEDIAN: 1,
+    MAX: 2,
 }
 
 function doBilinearInterpolation(pixelImage: PixelImage, i: number, j: number): Pixel {
@@ -658,4 +665,141 @@ function doSinglePixelOperation(image: PixelImage, operation: (pixelValue: numbe
             )
         }
     }
+}
+
+function getCityBlockDistance(image: PixelImage, x: number, y: number, size: number): Pixel[] {
+    const neighbourhood: Pixel[] = []
+
+    for (let i = x - size; i <= x + size; i++) {
+        if (i >= 0 && i < image.pixels.length) {
+            neighbourhood.push(image.pixels[i][y])
+        }
+    }
+
+    for (let j = y - size; j <= y + size; j++) {
+        if (j >= 0 && j < image.pixels[0].length) {
+            neighbourhood.push(image.pixels[x][j])
+        }
+    }
+
+    return neighbourhood
+}
+
+function getChessBoardDistance(image: PixelImage, x: number, y: number, size: number): Pixel[] {
+    const neighbourhood: Pixel[] = []
+
+    for (let i = x - size; i <= x + size; i++) {
+        for (let j = y - size; j <= y + size; j++) {
+            if (i >= 0 && j >= 0 && i < image.pixels.length && j < image.pixels[0].length) {
+                neighbourhood.push(image.pixels[i][j])
+            }
+        }
+    }
+    return neighbourhood
+}
+
+function getMinOfNeighbourhood(neighbourhood: Pixel[]): Pixel {
+    let minRed = 255
+    let minGreen = 255
+    let minBlue = 255
+
+    for (let i = 0; i < neighbourhood.length; i++) {
+        const pixel = neighbourhood[i]
+        minRed = Math.min(minRed, pixel.red)
+        minGreen = Math.min(minGreen, pixel.green)
+        minBlue = Math.min(minBlue, pixel.blue)
+    }
+
+    return new Pixel(minRed, minGreen, minBlue)
+}
+
+function getMaxOfNeighbourhood(neighbourhood: Pixel[]): Pixel {
+    let maxRed = 0
+    let maxGreen = 0
+    let maxBlue = 0
+
+    for (let i = 0; i < neighbourhood.length; i++) {
+        const pixel = neighbourhood[i]
+        maxRed = Math.max(maxRed, pixel.red)
+        maxGreen = Math.max(maxGreen, pixel.green)
+        maxBlue = Math.max(maxBlue, pixel.blue)
+    }
+
+    return new Pixel(maxRed, maxGreen, maxBlue)
+}
+
+function getMedian(values: number[]): number {
+    values.sort((a, b) => a - b)
+    if (values.length % 2 === 0) {
+        return (values[values.length / 2] + values[values.length / 2 - 1]) / 2
+    } else {
+        return values[Math.floor(values.length / 2)]
+    }
+}
+
+function getMedianOfNeighbourhood(neighbourhood: Pixel[]): Pixel {
+    const redValues: number[] = []
+    const greenValues: number[] = []
+    const blueValues: number[] = []
+
+    for (let i = 0; i < neighbourhood.length; i++) {
+        const pixel = neighbourhood[i]
+        redValues.push(pixel.red)
+        greenValues.push(pixel.green)
+        blueValues.push(pixel.blue)
+    }
+
+    const redMedian = getMedian(redValues)
+    const greenMedian = getMedian(greenValues)
+    const blueMedian = getMedian(blueValues)
+
+    return new Pixel(redMedian, greenMedian, blueMedian)
+}
+
+export function doFiltering(image: PixelImage, filteringType: number, neigbourhoodType: number, neighbourHoodSize: number) {
+    console.log(filteringType, neigbourhoodType, neighbourHoodSize)
+
+    let doFiltering: (neighbourhood: Pixel[]) => Pixel
+
+    let getNeighbourhood: (image: PixelImage, x: number, y: number, size: number) => Pixel[]
+
+    switch (filteringType) {
+        case FilteringOptions.MIN:
+            doFiltering = getMinOfNeighbourhood
+            break;
+        case FilteringOptions.MEDIAN:
+            doFiltering = getMedianOfNeighbourhood
+            break;
+        case FilteringOptions.MAX:
+            doFiltering = getMaxOfNeighbourhood
+            break;
+        default:
+            throw new Error("Invalid filtering type")
+    }
+
+    switch (neigbourhoodType) {
+        case NeighbourhoodOptions.CITY_BLOCK:
+            getNeighbourhood = getCityBlockDistance
+            break;
+        case NeighbourhoodOptions.CHESS_BOARD:
+            getNeighbourhood = getChessBoardDistance
+            break;
+        default:
+            throw new Error("Invalid neighbourhood type")
+    }
+
+    const height = image.pixels.length
+    const width = image.pixels[0].length
+
+    const pixels: Pixel[][] = []
+
+    for (let i = 0; i < height; i++) {
+        pixels[i] = []
+        for (let j = 0; j < width; j++) {
+            const neighbourhood = getNeighbourhood(image, i, j, neighbourHoodSize)
+            const filteredPixel = doFiltering(neighbourhood)
+            pixels[i][j] = filteredPixel
+        }
+    }
+    image.overwrite(pixels, width, height)
 }

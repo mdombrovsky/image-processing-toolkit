@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doIndexing, doLinearMapping, doPowerLawMapping, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doFiltering, doIndexing, doLinearMapping, doPowerLawMapping, FilteringOptions, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Accordion, Button, Col, Container, Form, Row } from 'react-bootstrap';
 import RangeSlider from 'react-bootstrap-range-slider';
@@ -629,13 +629,13 @@ const ModifyImage: React.FC = () => {
                             <Row>
                                 <Col>
                                     <Row className="m-1">
-                                        <Button variant="secondary" onClick={() => modifyImage(() => { })}>Max filtering</Button>
+                                        <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MAX, neighbourhoodOption, neighbourhoodSize) })}>Max filtering</Button>
                                     </Row>
                                     <Row className="m-1">
-                                        <Button variant="secondary" onClick={() => modifyImage(() => { })}>Median filtering</Button>
+                                        <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MEDIAN, neighbourhoodOption, neighbourhoodSize) })}>Median filtering</Button>
                                     </Row>
                                     <Row className="m-1">
-                                        <Button variant="secondary" onClick={() => modifyImage(() => { })}>Min filtering</Button>
+                                        <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MIN, neighbourhoodOption, neighbourhoodSize) })}>Min filtering</Button>
                                     </Row>
                                 </Col>
                                 <Col className="text-start">
