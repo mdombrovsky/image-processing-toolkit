@@ -6,7 +6,7 @@ import './App.css';
 function App() {
   return (
     <div className="App">
-      <h1>test</h1>
+      <h1 className="m-2 mb-3">Image processing toolkit</h1>
       <ImageProcessor />
     </div>
   );
