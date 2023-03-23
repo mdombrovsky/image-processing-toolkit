@@ -232,7 +232,7 @@ const ModifyImage: React.FC = () => {
                 <Col >
 
                     <Row className="align-items-center">
-                        <Accordion alwaysOpen>
+                        <Accordion>
 
                             <Accordion.Item eventKey='basic'>
                                 <Accordion.Header>
