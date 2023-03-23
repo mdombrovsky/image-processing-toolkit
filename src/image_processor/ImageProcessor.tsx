@@ -162,7 +162,7 @@ const ModifyImage: React.FC = () => {
                 }
             }}
             style={{
-                width: '100%',
+                width: '95%',
                 height: 'auto',
                 marginRight: "auto",
                 marginLeft: "auto",
@@ -671,14 +671,13 @@ const ModifyImage: React.FC = () => {
                             </Form.Group>
                         </Col>
                         <Col>
-                            <Row>
-                                <Col>
-                                    <Button variant="danger" onClick={() => {
-                                        setImage(loadedImage)
-                                        // setAltImage(defaultAltImage)
-                                    }}>Reset</Button>
-                                </Col>
-                            </Row>
+                            <Button variant="danger" onClick={() => {
+                                setImage(loadedImage)
+                                // setAltImage(defaultAltImage)
+                            }}>Reset</Button>
+                        </Col>
+                        <Col className="m-1">
+                            <Button variant="warning" onClick={() => setAltImage(defaultAltImage)} disabled={altImage == null}>Hide secondary display</Button>
                         </Col>
                     </Row>
                     <Row>
@@ -689,9 +688,6 @@ const ModifyImage: React.FC = () => {
                     <Row>
                         {altImage}
                     </Row>
-                    {altImage && <Row className="m-1">
-                        <Button variant="warning" onClick={() => setAltImage(defaultAltImage)} disabled={altImage == null}>Hide secondary display</Button>
-                    </Row>}
                 </Col>
             </Row>
 
