@@ -161,7 +161,14 @@ const ModifyImage: React.FC = () => {
                     type: useLog ? 'log' : 'linear'
                 }
             }}
-            style={{ width: '70vw', height: '50vh', margin: "auto" }}
+            style={{
+                width: '100%',
+                height: 'auto',
+                marginRight: "auto",
+                marginLeft: "auto",
+                marginTop: "0",
+                marginBottom: "0"
+            }}
         />
 
         setAltImage(plot)
@@ -220,468 +227,478 @@ const ModifyImage: React.FC = () => {
     }
 
     return (
-        <Container>
+        <Container fluid>
             <Row>
-                <Col>
-                    <img ref={imageRef} src={image} alt="Image" />
+                <Col >
+
+                    <Row className="align-items-center">
+                        <Accordion alwaysOpen>
+
+                            <Accordion.Item eventKey='basic'>
+                                <Accordion.Header>
+                                    Basic
+                                </Accordion.Header>
+                                <Accordion.Body>
+                                    <Row className="align-items-center">
+                                        <Col>
+                                            <Form.Group>
+                                                <Row className="align-items-center">
+                                                    <Col className="mx-1">
+                                                        <Row>
+                                                            <Form.Label htmlFor="topInput">Top:</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                id="topInput"
+                                                                name="top crop"
+                                                                min={0}
+                                                                defaultValue={0}
+                                                                onChange={(e) => setTop(Number(e.target.value))}
+                                                            />
+                                                        </Row>
+                                                        <Row>
+                                                            <Form.Label htmlFor="bottomInput">Bottom:</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                id="bottomInput"
+                                                                name="bottom crop"
+                                                                min={0}
+                                                                defaultValue={0}
+                                                                onChange={(e) => setBottom(Number(e.target.value))}
+                                                            />
+                                                        </Row>
+                                                    </Col>
+                                                    <Col className="">
+                                                        <Row>
+                                                            <Form.Label htmlFor="leftInput">Left:</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                id="leftInput"
+                                                                name="left crop"
+                                                                min={0}
+                                                                defaultValue={0}
+                                                                onChange={(e) => setLeft(Number(e.target.value))}
+                                                            />
+                                                        </Row>
+                                                        <Row>
+                                                            <Form.Label htmlFor="rightInput">Right:</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                id="rightInput"
+                                                                name="right crop"
+                                                                min={0}
+                                                                defaultValue={0}
+                                                                onChange={(e) => setRight(Number(e.target.value))}
+                                                            />
+                                                        </Row>
+                                                    </Col>
+                                                    <Col>
+                                                        <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => crop(pixels, top, bottom, left, right))}>
+                                                            crop
+                                                        </Button>
+                                                    </Col>
+                                                </Row>
+                                            </Form.Group>
+
+                                        </Col>
+                                        <Col>
+                                            <Row className="align-items-center">
+                                                <Form.Group>
+                                                    <Row className="align-items-center">
+                                                        <Col>
+                                                            <Form.Label>Rotate amount:</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                defaultValue={45}
+                                                                onChange={e => setRotateAmount(parseInt(e.target.value, 10) || 0)}
+                                                            />
+                                                        </Col>
+                                                        <Col>
+                                                            <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount, scaleOption, red, green, blue))}>rotate</Button>
+                                                        </Col>
+                                                    </Row>
+                                                </Form.Group>
+                                            </Row>
+                                            <Row className="align-items-center">
+                                                <Form.Group>
+                                                    <Row className="align-items-center">
+                                                        <Col>
+                                                            <Form.Label>Scale:</Form.Label>
+                                                            <Form.Control
+                                                                type="number"
+                                                                defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setScale(Number(e.target.value))}
+                                                            />
+                                                        </Col>
+                                                        <Col>
+                                                            <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</Button>
+
+                                                        </Col>
+                                                    </Row>
+                                                </Form.Group>
+                                            </Row>
+                                        </Col>
+                                        <Col
+                                            style={{
+                                                backgroundColor: `rgb(${red}, ${green}, ${blue})`,
+                                            }}
+                                        >
+                                            <Row style={{
+                                                backgroundColor: `rgb(255,255,255)`,
+                                            }}>
+                                                <Form.Label>Padding Color Picker</Form.Label>
+                                            </Row>
+                                            <Row>
+                                                <RangeSlider
+                                                    value={red}
+                                                    min={0}
+                                                    max={255}
+                                                    onChange={e => { setRed(e.target.valueAsNumber) }}
+                                                    tooltipLabel={(value) => `Red: ${value}`}
+                                                />
+                                            </Row>
+                                            <Row>
+                                                <RangeSlider
+                                                    value={green}
+                                                    min={0}
+                                                    max={255}
+                                                    onChange={e => { setGreen(e.target.valueAsNumber) }}
+                                                    tooltipLabel={(value) => `Green: ${value}`}
+                                                />
+                                            </Row>
+                                            <Row>
+                                                <RangeSlider
+                                                    value={blue}
+                                                    min={0}
+                                                    max={255}
+                                                    onChange={e => { setBlue(e.target.valueAsNumber) }}
+                                                    tooltipLabel={(value) => `Blue: ${value}`}
+                                                />
+                                            </Row>
+                                        </Col>
+                                        <Col className="align-items-center">
+                                            <Form.Group>
+                                                <Form.Check
+                                                    type="radio"
+                                                    name="scaleOption"
+                                                    id="bicubic"
+                                                    label="Bicubic interpolation"
+                                                    checked={scaleOption === ScaleOptions.BICUBIC}
+                                                    onChange={() => setScaleOption(ScaleOptions.BICUBIC)}
+                                                />
+                                                <Form.Check
+                                                    type="radio"
+                                                    name="scaleOption"
+                                                    id="bilinear"
+                                                    label="Bilinear interpolation"
+                                                    checked={scaleOption === ScaleOptions.BILINEAR}
+                                                    onChange={() => setScaleOption(ScaleOptions.BILINEAR)}
+                                                />
+                                                <Form.Check
+                                                    type="radio"
+                                                    name="scaleOption"
+                                                    id="nearest"
+                                                    label="Nearest neighbour interpolation"
+                                                    checked={scaleOption === ScaleOptions.NEAREST}
+                                                    onChange={() => setScaleOption(ScaleOptions.NEAREST)}
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col>
+                                            <Row className="mb-1">
+                                                <Button variant="secondary" onClick={() => modifyImage(invertPixels)}>Invert Pixels</Button>
+
+                                            </Row>
+                                            <Row className="mb-1">
+                                                <Button variant="secondary" onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</Button>
+
+                                            </Row>
+                                            <Row>
+                                                <Button variant="secondary" onClick={() => modifyImage(flipVertically)}>Flip vertically</Button>
+
+                                            </Row>
+                                        </Col>
+                                    </Row>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey='mappings'>
+                                <Accordion.Header>
+                                    Mappings
+                                </Accordion.Header>
+                                <Accordion.Body>
+                                    <Row>
+                                        <Form.Group>
+                                            <Row className="align-items-center">
+                                                <Col>
+                                                    <Form.Label>Alpha (α):</Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        defaultValue={alpha}
+                                                        step={0.1}
+                                                        onChange={(e) => setAlpha(Number(e.target.value))}
+                                                    />
+
+                                                </Col>
+                                                <Col>
+                                                    <Form.Label>Beta (β):</Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        defaultValue={beta}
+                                                        onChange={(e) => setBeta(Number(e.target.value))}
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Row className="">
+                                                        <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doLinearMapping(image, alpha, beta))}>
+                                                            Linear mapping <br />m(u)=αu+β
+                                                        </Button>
+                                                    </Row>
+                                                </Col>
+                                                <Col>
+                                                    <Form.Label>Gamma (γ):</Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        defaultValue={gamma}
+                                                        step={0.1}
+                                                        onChange={(e) => setGamma(Number(e.target.value))}
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Row className="">
+                                                        <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doPowerLawMapping(image, gamma))}>
+                                                            Power law mapping <br /> m(u)=(L-)[u/(L-1)]^γ
+                                                        </Button>
+                                                    </Row>
+
+                                                </Col>
+                                            </Row>
+                                        </Form.Group>
+
+                                    </Row >
+                                </Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey='convolutions'>
+                                <Accordion.Header>
+                                    Convolutions and Indexing
+                                </Accordion.Header>
+                                <Accordion.Body>
+                                    <Row className="align-items-center">
+                                        <Col>
+                                            <Form>
+                                                <Form.Group>
+                                                    <Form.Label>Convolution Kernel</Form.Label>
+                                                    <Form.Control as="textarea" rows={3} defaultValue={matrixToString(defaultKernel)} onChange={(e) => { setMatrixFromString(e.target.value) }} />
+                                                    {validKernel ? (
+                                                        <Form.Text className="text-success">Kernel is valid</Form.Text>
+                                                    ) : (
+                                                        <Form.Text className="text-danger">Kernel is invalid</Form.Text>
+                                                    )}
+                                                </Form.Group>
+                                            </Form>
+                                        </Col>
+                                        <Col className="text-start">
+                                            <Form.Group>
+                                                <Row>
+                                                    <Form.Check
+                                                        type="radio"
+                                                        name="boundingOption"
+                                                        id="cut_off"
+                                                        label="Cut off out of bounds"
+                                                        checked={boundingOption === BoundingOptions.CUT_OFF}
+                                                        onChange={() => setBoundingOption(BoundingOptions.CUT_OFF)}
+                                                    />
+                                                </Row>
+                                                <Row>
+                                                    <Form.Check
+                                                        type="radio"
+                                                        name="boundingOption"
+                                                        id="normalize_values"
+                                                        label="Normalize values to 0..255"
+                                                        checked={boundingOption === BoundingOptions.NORMALIZE}
+                                                        onChange={() => setBoundingOption(BoundingOptions.NORMALIZE)}
+                                                    />
+                                                </Row>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col className="text-start">
+                                            <Form.Group>
+                                                <Row>
+                                                    <Form.Check
+                                                        type="radio"
+                                                        name="indexingOption"
+                                                        id="reflective"
+                                                        label="Reflective indexing"
+                                                        checked={indexingOption === IndexingOptions.REFLECTIVE}
+                                                        onChange={() => setIndexingOption(IndexingOptions.REFLECTIVE)}
+                                                    />
+                                                </Row>
+                                                <Row>
+                                                    <Form.Check
+                                                        type="radio"
+                                                        name="indexingOption"
+                                                        id="circular"
+                                                        label="Circular indexing"
+                                                        checked={indexingOption === IndexingOptions.CIRCULAR}
+                                                        onChange={() => setIndexingOption(IndexingOptions.CIRCULAR)}
+                                                    />
+                                                </Row>
+                                                <Row>
+                                                    <Form.Check
+                                                        type="radio"
+                                                        name="indexingOption"
+                                                        id="zero"
+                                                        label="Zero padding"
+                                                        checked={indexingOption === IndexingOptions.ZERO}
+                                                        onChange={() => setIndexingOption(IndexingOptions.ZERO)}
+                                                    />
+                                                </Row>
+
+                                            </Form.Group>
+                                        </Col>
+
+                                        <Col>
+
+                                            <Button variant="secondary" disabled={!validKernel} onClick={() => modifyImage((pixels: PixelImage) => performConvolution(pixels, kernel, indexingOption, boundingOption))}>Perform Convolution</Button>
+                                        </Col>
+                                        <Col>
+                                            <Form.Group>
+                                                <Row className="align-items-center">
+                                                    <Col>
+                                                        <Form.Label>Scale Via Indexing:</Form.Label>
+                                                        <Form.Control
+                                                            type="number"
+                                                            defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setIndexingScale(Number(e.target.value))}
+                                                        />
+                                                    </Col>
+                                                    <Col>
+                                                        <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => doIndexing(pixels, indexingScale, indexingOption))}>Scale via Indexing</Button>
+
+                                                    </Col>
+                                                </Row>
+                                            </Form.Group>
+                                        </Col>
+
+                                    </Row>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey='histogram'>
+                                <Accordion.Header>
+                                    Histogram
+                                </Accordion.Header>
+                                <Accordion.Body>
+
+                                    <Row>
+                                        <Col>
+                                            <Button variant="secondary" onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</Button>
+                                        </Col>
+                                        <Col>
+                                            <Button variant="info" onClick={() => modifyImage(plotFrequencyHistogram)}>Compute frequency histogram</Button>
+                                        </Col>
+                                        <Col>
+                                            <Button variant="info" onClick={() => modifyImage(plotCumulativeNormalizedHistogram)}>Compute cumulative normalized histogram</Button>
+                                        </Col>
+
+                                    </Row>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey='filter'>
+                                <Accordion.Header>
+                                    Filtering
+                                </Accordion.Header>
+                                <Accordion.Body>
+                                    <Row>
+                                        <Col>
+                                            <Row className="m-1">
+                                                <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MAX, neighbourhoodOption, neighbourhoodSize) })}>Max filtering</Button>
+                                            </Row>
+                                            <Row className="m-1">
+                                                <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MEDIAN, neighbourhoodOption, neighbourhoodSize) })}>Median filtering</Button>
+                                            </Row>
+                                            <Row className="m-1">
+                                                <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MIN, neighbourhoodOption, neighbourhoodSize) })}>Min filtering</Button>
+                                            </Row>
+                                        </Col>
+                                        <Col className="text-start">
+                                            <Form.Group>
+                                                <Row>
+                                                    <Form.Label htmlFor="neighbourhoodSize">Neighboorhood Size:</Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        id="neighbourhoodSize"
+                                                        name="Neighbourhood Size"
+                                                        min={1}
+                                                        defaultValue={1}
+                                                        onChange={(e) => {
+                                                            const value = Math.max(1, Math.round(Number(e.target.value)));
+                                                            setNeighbourhoodSize(value)
+                                                        }}
+                                                        pattern="^[0-9]*$"
+                                                    />
+                                                </Row>
+                                                <Row>
+                                                    <Form.Check
+                                                        type="radio"
+                                                        name="neighbourhoodOption"
+                                                        id="cityBlock"
+                                                        label="City Block neighbourhood"
+                                                        checked={neighbourhoodOption === NeighbourhoodOptions.CITY_BLOCK}
+                                                        onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CITY_BLOCK)}
+                                                    />
+                                                </Row>
+                                                <Row>
+                                                    <Form.Check
+                                                        type="radio"
+                                                        name="neighbourhoodOption"
+                                                        id="chessBoard"
+                                                        label="Chess Board neighbourhood"
+                                                        checked={neighbourhoodOption === NeighbourhoodOptions.CHESS_BOARD}
+                                                        onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CHESS_BOARD)}
+                                                    />
+                                                </Row>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        </Accordion>
+                    </Row >
                 </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <p>
-                        Height: {height},
-                        Width: {width}
-                    </p>
-                </Col>
-                <Col>
-                    <Form.Group controlId="formFile" >
-                        <Form.Control type="file" accept="image/*" onChange={handleImageUpload} />
-                    </Form.Group>
-                </Col>
-                <Col>
+                <Col xs={8}>
                     <Row>
                         <Col>
-                            <Button variant="danger" onClick={() => {
-                                setImage(loadedImage)
-                                // setAltImage(defaultAltImage)
-                            }}>Reset</Button>
+                            <p>
+                                Height: {height},
+                                Width: {width}
+                            </p>
+                        </Col>
+                        <Col>
+                            <Form.Group controlId="formFile" >
+                                <Form.Control type="file" accept="image/*" onChange={handleImageUpload} />
+                            </Form.Group>
+                        </Col>
+                        <Col>
+                            <Row>
+                                <Col>
+                                    <Button variant="danger" onClick={() => {
+                                        setImage(loadedImage)
+                                        // setAltImage(defaultAltImage)
+                                    }}>Reset</Button>
+                                </Col>
+                            </Row>
                         </Col>
                     </Row>
+                    <Row>
+                        <Col>
+                            <img ref={imageRef} src={image} alt="Image" />
+                        </Col>
+                    </Row>
+                    <Row>
+                        {altImage}
+                    </Row>
+                    {altImage && <Row className="m-1">
+                        <Button variant="warning" onClick={() => setAltImage(defaultAltImage)} disabled={altImage == null}>Hide secondary display</Button>
+                    </Row>}
                 </Col>
             </Row>
-            <Row className="align-items-center">
-                <Accordion alwaysOpen>
 
-                    <Accordion.Item eventKey='basic'>
-                        <Accordion.Header>
-                            Basic
-                        </Accordion.Header>
-                        <Accordion.Body>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <Form.Group>
-                                        <Row className="align-items-center">
-                                            <Col className="mx-1">
-                                                <Row>
-                                                    <Form.Label htmlFor="topInput">Top:</Form.Label>
-                                                    <Form.Control
-                                                        type="number"
-                                                        id="topInput"
-                                                        name="top crop"
-                                                        min={0}
-                                                        defaultValue={0}
-                                                        onChange={(e) => setTop(Number(e.target.value))}
-                                                    />
-                                                </Row>
-                                                <Row>
-                                                    <Form.Label htmlFor="bottomInput">Bottom:</Form.Label>
-                                                    <Form.Control
-                                                        type="number"
-                                                        id="bottomInput"
-                                                        name="bottom crop"
-                                                        min={0}
-                                                        defaultValue={0}
-                                                        onChange={(e) => setBottom(Number(e.target.value))}
-                                                    />
-                                                </Row>
-                                            </Col>
-                                            <Col className="">
-                                                <Row>
-                                                    <Form.Label htmlFor="leftInput">Left:</Form.Label>
-                                                    <Form.Control
-                                                        type="number"
-                                                        id="leftInput"
-                                                        name="left crop"
-                                                        min={0}
-                                                        defaultValue={0}
-                                                        onChange={(e) => setLeft(Number(e.target.value))}
-                                                    />
-                                                </Row>
-                                                <Row>
-                                                    <Form.Label htmlFor="rightInput">Right:</Form.Label>
-                                                    <Form.Control
-                                                        type="number"
-                                                        id="rightInput"
-                                                        name="right crop"
-                                                        min={0}
-                                                        defaultValue={0}
-                                                        onChange={(e) => setRight(Number(e.target.value))}
-                                                    />
-                                                </Row>
-                                            </Col>
-                                            <Col>
-                                                <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => crop(pixels, top, bottom, left, right))}>
-                                                    crop
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </Form.Group>
-
-                                </Col>
-                                <Col>
-                                    <Row className="align-items-center">
-                                        <Form.Group>
-                                            <Row className="align-items-center">
-                                                <Col>
-                                                    <Form.Label>Rotate amount:</Form.Label>
-                                                    <Form.Control
-                                                        type="number"
-                                                        defaultValue={45}
-                                                        onChange={e => setRotateAmount(parseInt(e.target.value, 10) || 0)}
-                                                    />
-                                                </Col>
-                                                <Col>
-                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount, scaleOption, red, green, blue))}>rotate</Button>
-                                                </Col>
-                                            </Row>
-                                        </Form.Group>
-                                    </Row>
-                                    <Row className="align-items-center">
-                                        <Form.Group>
-                                            <Row className="align-items-center">
-                                                <Col>
-                                                    <Form.Label>Scale:</Form.Label>
-                                                    <Form.Control
-                                                        type="number"
-                                                        defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setScale(Number(e.target.value))}
-                                                    />
-                                                </Col>
-                                                <Col>
-                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</Button>
-
-                                                </Col>
-                                            </Row>
-                                        </Form.Group>
-                                    </Row>
-                                </Col>
-                                <Col
-                                    style={{
-                                        backgroundColor: `rgb(${red}, ${green}, ${blue})`,
-                                    }}
-                                >
-                                    <Row style={{
-                                        backgroundColor: `rgb(255,255,255)`,
-                                    }}>
-                                        <Form.Label>Padding Color Picker</Form.Label>
-                                    </Row>
-                                    <Row>
-                                        <RangeSlider
-                                            value={red}
-                                            min={0}
-                                            max={255}
-                                            onChange={e => { setRed(e.target.valueAsNumber) }}
-                                            tooltipLabel={(value) => `Red: ${value}`}
-                                        />
-                                    </Row>
-                                    <Row>
-                                        <RangeSlider
-                                            value={green}
-                                            min={0}
-                                            max={255}
-                                            onChange={e => { setGreen(e.target.valueAsNumber) }}
-                                            tooltipLabel={(value) => `Green: ${value}`}
-                                        />
-                                    </Row>
-                                    <Row>
-                                        <RangeSlider
-                                            value={blue}
-                                            min={0}
-                                            max={255}
-                                            onChange={e => { setBlue(e.target.valueAsNumber) }}
-                                            tooltipLabel={(value) => `Blue: ${value}`}
-                                        />
-                                    </Row>
-                                </Col>
-                                <Col className="align-items-center">
-                                    <Form.Group>
-                                        <Form.Check
-                                            type="radio"
-                                            name="scaleOption"
-                                            id="bicubic"
-                                            label="Bicubic interpolation"
-                                            checked={scaleOption === ScaleOptions.BICUBIC}
-                                            onChange={() => setScaleOption(ScaleOptions.BICUBIC)}
-                                        />
-                                        <Form.Check
-                                            type="radio"
-                                            name="scaleOption"
-                                            id="bilinear"
-                                            label="Bilinear interpolation"
-                                            checked={scaleOption === ScaleOptions.BILINEAR}
-                                            onChange={() => setScaleOption(ScaleOptions.BILINEAR)}
-                                        />
-                                        <Form.Check
-                                            type="radio"
-                                            name="scaleOption"
-                                            id="nearest"
-                                            label="Nearest neighbour interpolation"
-                                            checked={scaleOption === ScaleOptions.NEAREST}
-                                            onChange={() => setScaleOption(ScaleOptions.NEAREST)}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col>
-                                    <Row className="mb-1">
-                                        <Button variant="secondary" onClick={() => modifyImage(invertPixels)}>Invert Pixels</Button>
-
-                                    </Row>
-                                    <Row className="mb-1">
-                                        <Button variant="secondary" onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</Button>
-
-                                    </Row>
-                                    <Row>
-                                        <Button variant="secondary" onClick={() => modifyImage(flipVertically)}>Flip vertically</Button>
-
-                                    </Row>
-                                </Col>
-                            </Row>
-                        </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey='mappings'>
-                        <Accordion.Header>
-                            Mappings
-                        </Accordion.Header>
-                        <Accordion.Body>
-                            <Row>
-                                <Form.Group>
-                                    <Row className="align-items-center">
-                                        <Col>
-                                            <Form.Label>Alpha (α):</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                defaultValue={alpha}
-                                                step={0.1}
-                                                onChange={(e) => setAlpha(Number(e.target.value))}
-                                            />
-
-                                        </Col>
-                                        <Col>
-                                            <Form.Label>Beta (β):</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                defaultValue={beta}
-                                                onChange={(e) => setBeta(Number(e.target.value))}
-                                            />
-                                        </Col>
-                                        <Col>
-                                            <Row className="">
-                                                <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doLinearMapping(image, alpha, beta))}>
-                                                    Linear mapping <br />m(u)=αu+β
-                                                </Button>
-                                            </Row>
-                                        </Col>
-                                        <Col>
-                                            <Form.Label>Gamma (γ):</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                defaultValue={gamma}
-                                                step={0.1}
-                                                onChange={(e) => setGamma(Number(e.target.value))}
-                                            />
-                                        </Col>
-                                        <Col>
-                                            <Row className="">
-                                                <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doPowerLawMapping(image, gamma))}>
-                                                    Power law mapping <br /> m(u)=(L-)[u/(L-1)]^γ
-                                                </Button>
-                                            </Row>
-
-                                        </Col>
-                                    </Row>
-                                </Form.Group>
-
-                            </Row >
-                        </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey='convolutions'>
-                        <Accordion.Header>
-                            Convolutions and Indexing
-                        </Accordion.Header>
-                        <Accordion.Body>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <Form>
-                                        <Form.Group>
-                                            <Form.Label>Convolution Kernel</Form.Label>
-                                            <Form.Control as="textarea" rows={3} defaultValue={matrixToString(defaultKernel)} onChange={(e) => { setMatrixFromString(e.target.value) }} />
-                                            {validKernel ? (
-                                                <Form.Text className="text-success">Kernel is valid</Form.Text>
-                                            ) : (
-                                                <Form.Text className="text-danger">Kernel is invalid</Form.Text>
-                                            )}
-                                        </Form.Group>
-                                    </Form>
-                                </Col>
-                                <Col className="text-start">
-                                    <Form.Group>
-                                        <Row>
-                                            <Form.Check
-                                                type="radio"
-                                                name="boundingOption"
-                                                id="cut_off"
-                                                label="Cut off out of bounds"
-                                                checked={boundingOption === BoundingOptions.CUT_OFF}
-                                                onChange={() => setBoundingOption(BoundingOptions.CUT_OFF)}
-                                            />
-                                        </Row>
-                                        <Row>
-                                            <Form.Check
-                                                type="radio"
-                                                name="boundingOption"
-                                                id="normalize_values"
-                                                label="Normalize values to 0..255"
-                                                checked={boundingOption === BoundingOptions.NORMALIZE}
-                                                onChange={() => setBoundingOption(BoundingOptions.NORMALIZE)}
-                                            />
-                                        </Row>
-                                    </Form.Group>
-                                </Col>
-                                <Col className="text-start">
-                                    <Form.Group>
-                                        <Row>
-                                            <Form.Check
-                                                type="radio"
-                                                name="indexingOption"
-                                                id="reflective"
-                                                label="Reflective indexing"
-                                                checked={indexingOption === IndexingOptions.REFLECTIVE}
-                                                onChange={() => setIndexingOption(IndexingOptions.REFLECTIVE)}
-                                            />
-                                        </Row>
-                                        <Row>
-                                            <Form.Check
-                                                type="radio"
-                                                name="indexingOption"
-                                                id="circular"
-                                                label="Circular indexing"
-                                                checked={indexingOption === IndexingOptions.CIRCULAR}
-                                                onChange={() => setIndexingOption(IndexingOptions.CIRCULAR)}
-                                            />
-                                        </Row>
-                                        <Row>
-                                            <Form.Check
-                                                type="radio"
-                                                name="indexingOption"
-                                                id="zero"
-                                                label="Zero padding"
-                                                checked={indexingOption === IndexingOptions.ZERO}
-                                                onChange={() => setIndexingOption(IndexingOptions.ZERO)}
-                                            />
-                                        </Row>
-
-                                    </Form.Group>
-                                </Col>
-
-                                <Col>
-
-                                    <Button variant="secondary" disabled={!validKernel} onClick={() => modifyImage((pixels: PixelImage) => performConvolution(pixels, kernel, indexingOption, boundingOption))}>Perform Convolution</Button>
-                                </Col>
-                                <Col>
-                                    <Form.Group>
-                                        <Row className="align-items-center">
-                                            <Col>
-                                                <Form.Label>Scale Via Indexing:</Form.Label>
-                                                <Form.Control
-                                                    type="number"
-                                                    defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setIndexingScale(Number(e.target.value))}
-                                                />
-                                            </Col>
-                                            <Col>
-                                                <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => doIndexing(pixels, indexingScale, indexingOption))}>Scale via Indexing</Button>
-
-                                            </Col>
-                                        </Row>
-                                    </Form.Group>
-                                </Col>
-
-                            </Row>
-                        </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey='histogram'>
-                        <Accordion.Header>
-                            Histogram
-                        </Accordion.Header>
-                        <Accordion.Body>
-                            <Row>
-                                {altImage}
-                            </Row>
-                            <Row>
-                                <Col>
-                                    <Button variant="secondary" onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</Button>
-                                </Col>
-                                <Col>
-                                    <Button variant="info" onClick={() => modifyImage(plotFrequencyHistogram)}>Compute frequency histogram</Button>
-                                </Col>
-                                <Col>
-                                    <Button variant="info" onClick={() => modifyImage(plotCumulativeNormalizedHistogram)}>Compute cumulative normalized histogram</Button>
-                                </Col>
-                                <Col>
-                                    <Button variant="warning" onClick={() => setAltImage(defaultAltImage)} disabled={altImage == null}>Hide secondary display</Button>
-                                </Col>
-                            </Row>
-                        </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey='filter'>
-                        <Accordion.Header>
-                            Filtering
-                        </Accordion.Header>
-                        <Accordion.Body>
-                            <Row>
-                                <Col>
-                                    <Row className="m-1">
-                                        <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MAX, neighbourhoodOption, neighbourhoodSize) })}>Max filtering</Button>
-                                    </Row>
-                                    <Row className="m-1">
-                                        <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MEDIAN, neighbourhoodOption, neighbourhoodSize) })}>Median filtering</Button>
-                                    </Row>
-                                    <Row className="m-1">
-                                        <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MIN, neighbourhoodOption, neighbourhoodSize) })}>Min filtering</Button>
-                                    </Row>
-                                </Col>
-                                <Col className="text-start">
-                                    <Form.Group>
-                                        <Row>
-                                            <Form.Label htmlFor="neighbourhoodSize">Neighboorhood Size:</Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                id="neighbourhoodSize"
-                                                name="Neighbourhood Size"
-                                                min={1}
-                                                defaultValue={1}
-                                                onChange={(e) => {
-                                                    const value = Math.max(1, Math.round(Number(e.target.value)));
-                                                    setNeighbourhoodSize(value)
-                                                }}
-                                                pattern="^[0-9]*$"
-                                            />
-                                        </Row>
-                                        <Row>
-                                            <Form.Check
-                                                type="radio"
-                                                name="neighbourhoodOption"
-                                                id="cityBlock"
-                                                label="City Block neighbourhood"
-                                                checked={neighbourhoodOption === NeighbourhoodOptions.CITY_BLOCK}
-                                                onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CITY_BLOCK)}
-                                            />
-                                        </Row>
-                                        <Row>
-                                            <Form.Check
-                                                type="radio"
-                                                name="neighbourhoodOption"
-                                                id="chessBoard"
-                                                label="Chess Board neighbourhood"
-                                                checked={neighbourhoodOption === NeighbourhoodOptions.CHESS_BOARD}
-                                                onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CHESS_BOARD)}
-                                            />
-                                        </Row>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                        </Accordion.Body>
-                    </Accordion.Item>
-                </Accordion>
-            </Row >
         </Container >
     );
 };
