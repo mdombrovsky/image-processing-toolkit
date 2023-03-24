@@ -515,6 +515,28 @@ const ModifyImage: React.FC = () => {
                                                         " 2\t 0\t-2\n" +
                                                         " 1\t 0\t-1"
                                                     )}>Sobel Horizontal</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => setKernelFromString(
+                                                        " 1\t 1\t 1\n" +
+                                                        " 1\t 1\t 1\n" +
+                                                        " 1\t 1\t 1"
+                                                    )}>Mean Filter</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => setKernelFromString(
+                                                        " 0\t-1\t 0\n" +
+                                                        "-1\t 4\t-1\n" +
+                                                        " 0\t-1\t 0"
+                                                    )}>Laplacian Mask D4</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => setKernelFromString(
+                                                        "-1\t-1\t-1\n" +
+                                                        "-1\t 8\t-1\n" +
+                                                        "-1\t-1\t-1"
+                                                    )}>Laplacian Mask D8</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => setKernelFromString(
+                                                        " 1\t 1\t 2\t 1\t 1\n" +
+                                                        " 1\t 2\t 4\t 2\t 1\n" +
+                                                        " 2\t 4\t 8\t 4\t 2\n" +
+                                                        " 1\t 2\t 4\t 2\t 1\n" +
+                                                        " 1\t 1\t 2\t 1\t 1"
+                                                    )}>Gaussian Mask</Dropdown.Item>
                                                 </DropdownButton>
                                             </Row>
                                         </Col>
