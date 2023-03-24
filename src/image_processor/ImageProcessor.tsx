@@ -2,7 +2,7 @@ import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
 import { BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doFiltering, doIndexing, doLinearMapping, doPowerLawMapping, FilteringOptions, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
-import { Accordion, Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Accordion, Button, Col, Container, Dropdown, DropdownButton, Form, Row } from 'react-bootstrap';
 import RangeSlider from 'react-bootstrap-range-slider';
 
 function getPixelImageFromImageData(imageData: ImageData): PixelImage {
@@ -74,6 +74,7 @@ const ModifyImage: React.FC = () => {
     const [boundingOption, setBoundingOption] = useState(BoundingOptions.CUT_OFF)
     const [neighbourhoodOption, setNeighbourhoodOption] = useState(NeighbourhoodOptions.CHESS_BOARD)
     const [neighbourhoodSize, setNeighbourhoodSize] = useState(1);
+    const [kernelText, setKernelText] = useState<string>(matrixToString(defaultKernel))
 
     useEffect(() => {
         const image_ = new Image();
@@ -180,16 +181,17 @@ const ModifyImage: React.FC = () => {
         }
 
         const rows = input.trim().split("\n");
+        const spaceRegex = /\s+/;
 
         // Check that all rows have the same number of elements
-        const rowLength = rows[0].trim().split(" ").length;
-        const isValidLength = rows.every(row => row.trim().split(" ").length === rowLength);
+        const rowLength = rows[0].trim().split(spaceRegex).length;
+        const isValidLength = rows.every(row => row.trim().split(spaceRegex).length === rowLength);
         if (!isValidLength) {
             return [];
         }
 
         const matrix = rows.map(row => {
-            const elements = row.trim().split(" ");
+            const elements = row.trim().split(spaceRegex);
             const rowValues = elements.map(Number);
 
             // Check that all elements in a row are valid numbers
@@ -210,17 +212,22 @@ const ModifyImage: React.FC = () => {
         return matrix;
     }
 
-    function setMatrixFromString(input: string) {
-        const matrix = createMatrixFromString(input);
-        console.log(matrix)
 
-        if (matrix.length > 0 && matrix[0].length > 0) {
-            setKernel(matrix);
+    function setKernelFromString(input: string) {
+        setKernelText(input)
+        setAndValidateKernel(createMatrixFromString(input));
+    }
+
+    function setAndValidateKernel(kernel: number[][]) {
+        if (kernel.length > 0 && kernel[0].length > 0) {
+            setKernel(kernel);
             setValidKernel(true);
         } else {
             setValidKernel(false);
         }
     }
+
+
 
     function matrixToString(matrix: number[][]): string {
         return matrix.map(row => row.join(" ")).join("\n");
@@ -483,7 +490,7 @@ const ModifyImage: React.FC = () => {
                                             <Form>
                                                 <Form.Group>
                                                     <Form.Label>Convolution Kernel</Form.Label>
-                                                    <Form.Control as="textarea" rows={3} defaultValue={matrixToString(defaultKernel)} onChange={(e) => { setMatrixFromString(e.target.value) }} />
+                                                    <Form.Control as="textarea" rows={3} value={kernelText} onChange={(e) => { setKernelFromString(e.target.value) }} />
                                                     {validKernel ? (
                                                         <Form.Text className="text-success">Kernel is valid</Form.Text>
                                                     ) : (
@@ -492,9 +499,24 @@ const ModifyImage: React.FC = () => {
                                                 </Form.Group>
                                             </Form>
                                         </Col>
-                                        <Col lg={4}>
-
-                                            <Button variant="secondary" disabled={!validKernel} onClick={() => modifyImage((pixels: PixelImage) => performConvolution(pixels, kernel, indexingOption, boundingOption))}>Perform Convolution</Button>
+                                        <Col lg={4} className="align-items-center mb-2">
+                                            <Row className="mb-1">
+                                                <Button variant="secondary" disabled={!validKernel} onClick={() => modifyImage((pixels: PixelImage) => performConvolution(pixels, kernel, indexingOption, boundingOption))}>Perform Convolution</Button>
+                                            </Row>
+                                            <Row className="">
+                                                <DropdownButton style={{ width: '100%' }} id="built-in-kernels" title="Built in Kernels">
+                                                    <Dropdown.Item onClick={() => setKernelFromString(
+                                                        " 1\t 2\t 1\n" +
+                                                        " 0\t 0\t 0\n" +
+                                                        "-1\t-2\t-1"
+                                                    )}>Sobel Vertical</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => setKernelFromString(
+                                                        " 1\t 0\t-1\n" +
+                                                        " 2\t 0\t-2\n" +
+                                                        " 1\t 0\t-1"
+                                                    )}>Sobel Horizontal</Dropdown.Item>
+                                                </DropdownButton>
+                                            </Row>
                                         </Col>
                                     </Row>
                                     <Row className="align-items-center mb-2">
