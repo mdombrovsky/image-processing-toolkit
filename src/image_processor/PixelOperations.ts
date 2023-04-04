@@ -37,7 +37,7 @@ export class Pixel {
             )
         }
     }
-    overwrite(red: number, green: number, blue: number, alpha: number = 255, disabled: boolean = false) {
+    overwrite(red: number, green: number, blue: number, alpha: number = this.alpha, disabled: boolean = false) {
         if (red > 255 || green > 255 || blue > 255 || red < 0 || green < 0 || blue < 0) {
             alert("out of range: (" + red + ", " + green + ", " + blue + ")")
         }
