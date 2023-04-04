@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { addPepperNoise, addSaltAndPepperNoise, addSaltNoise, BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doFiltering, doIndexing, doLinearMapping, doPowerLawMapping, FilteringOptions, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { addPepperNoise, addSaltAndPepperNoise, addSaltNoise, BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doFiltering, doIndexing, doLinearMapping, doPowerLawMapping, FilteringOptions, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions, turnIntoGrayscale } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Accordion, Button, Col, Container, Dropdown, DropdownButton, Form, Row } from 'react-bootstrap';
 import RangeSlider from 'react-bootstrap-range-slider';
@@ -233,6 +233,10 @@ const ModifyImage: React.FC = () => {
         return matrix.map(row => row.join(" ")).join("\n");
     }
 
+    function makeGrayscale(image: PixelImage): void {
+        throw new Error('Function not implemented.');
+    }
+
     return (
         <Container fluid>
             <Row>
@@ -406,17 +410,19 @@ const ModifyImage: React.FC = () => {
                                         </Col>
 
                                         <Col className="align-items-center">
-                                            <Row className="mb-1">
+                                            <Row className="m-1">
                                                 <Button variant="secondary" onClick={() => modifyImage(invertPixels)}>Invert Pixels</Button>
 
                                             </Row>
-                                            <Row className="mb-1">
+                                            <Row className="m-1">
                                                 <Button variant="secondary" onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</Button>
 
                                             </Row>
-                                            <Row>
+                                            <Row className="m-1">
                                                 <Button variant="secondary" onClick={() => modifyImage(flipVertically)}>Flip vertically</Button>
-
+                                            </Row>
+                                            <Row className="m-1">
+                                                <Button variant="warning" onClick={() => modifyImage(turnIntoGrayscale)}>Make Grayscale</Button>
                                             </Row>
                                         </Col>
 

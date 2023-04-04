@@ -842,3 +842,16 @@ export function addSaltNoise(image: PixelImage) {
 export function addPepperNoise(image: PixelImage) {
     addNoise(image, 0.01, false, true)
 }
+
+export function turnIntoGrayscale(image: PixelImage) {
+    const height = image.pixels.length
+    const width = image.pixels[0].length
+
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            const pixel = image.pixels[i][j]
+            const average = Math.round((pixel.red + pixel.green + pixel.blue) / 3)
+            pixel.overwrite(average, average, average)
+        }
+    }
+}
