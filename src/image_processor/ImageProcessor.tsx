@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doFiltering, doIndexing, doLinearMapping, doPowerLawMapping, FilteringOptions, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
+import { addPepperNoise, addSaltAndPepperNoise, addSaltNoise, BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doFiltering, doIndexing, doLinearMapping, doPowerLawMapping, FilteringOptions, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Accordion, Button, Col, Container, Dropdown, DropdownButton, Form, Row } from 'react-bootstrap';
 import RangeSlider from 'react-bootstrap-range-slider';
@@ -656,45 +656,58 @@ const ModifyImage: React.FC = () => {
                                                 <Button variant="secondary" onClick={() => modifyImage((image) => { doFiltering(image, FilteringOptions.MIN, neighbourhoodOption, neighbourhoodSize) })}>Min filtering</Button>
                                             </Row>
                                         </Col>
-                                        <Col className="text-start">
-                                            <Form.Group>
-                                                <Row className="mb-1">
-                                                    <Form.Label htmlFor="neighbourhoodSize">Neighboorhood Size:</Form.Label>
-                                                    <Form.Control
-                                                        type="number"
-                                                        id="neighbourhoodSize"
-                                                        name="Neighbourhood Size"
-                                                        min={1}
-                                                        defaultValue={1}
-                                                        onChange={(e) => {
-                                                            const value = Math.max(1, Math.round(Number(e.target.value)));
-                                                            setNeighbourhoodSize(value)
-                                                        }}
-                                                        pattern="^[0-9]*$"
-                                                    />
-                                                </Row>
-                                                <Row>
-                                                    <Form.Check
-                                                        type="radio"
-                                                        name="neighbourhoodOption"
-                                                        id="cityBlock"
-                                                        label="City Block neighbourhood"
-                                                        checked={neighbourhoodOption === NeighbourhoodOptions.CITY_BLOCK}
-                                                        onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CITY_BLOCK)}
-                                                    />
-                                                </Row>
-                                                <Row>
-                                                    <Form.Check
-                                                        type="radio"
-                                                        name="neighbourhoodOption"
-                                                        id="chessBoard"
-                                                        label="Chess Board neighbourhood"
-                                                        checked={neighbourhoodOption === NeighbourhoodOptions.CHESS_BOARD}
-                                                        onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CHESS_BOARD)}
-                                                    />
-                                                </Row>
-                                            </Form.Group>
+                                        <Col>
+
+
+                                            <Row className="m-1">
+                                                <Button variant="secondary" onClick={() => modifyImage(addPepperNoise)}>Add Pepper</Button>
+                                            </Row>
+                                            <Row className="m-1">
+                                                <Button variant="secondary" onClick={() => modifyImage(addSaltAndPepperNoise)}>Add Salt and Pepper</Button>
+                                            </Row>
+                                            <Row className="m-1">
+                                                <Button variant="secondary" onClick={() => modifyImage(addSaltNoise)}>Add Salt</Button>
+                                            </Row>
                                         </Col>
+                                    </Row>
+                                    <Row className="align-items-center mt-2">
+                                        <Form.Group>
+                                            <Row className="mb-1">
+                                                <Form.Label htmlFor="neighbourhoodSize">Neighboorhood Size:</Form.Label>
+                                                <Form.Control
+                                                    type="number"
+                                                    id="neighbourhoodSize"
+                                                    name="Neighbourhood Size"
+                                                    min={1}
+                                                    defaultValue={1}
+                                                    onChange={(e) => {
+                                                        const value = Math.max(1, Math.round(Number(e.target.value)));
+                                                        setNeighbourhoodSize(value)
+                                                    }}
+                                                    pattern="^[0-9]*$"
+                                                />
+                                            </Row>
+                                            <Row>
+                                                <Form.Check
+                                                    type="radio"
+                                                    name="neighbourhoodOption"
+                                                    id="cityBlock"
+                                                    label="City Block neighbourhood"
+                                                    checked={neighbourhoodOption === NeighbourhoodOptions.CITY_BLOCK}
+                                                    onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CITY_BLOCK)}
+                                                />
+                                            </Row>
+                                            <Row>
+                                                <Form.Check
+                                                    type="radio"
+                                                    name="neighbourhoodOption"
+                                                    id="chessBoard"
+                                                    label="Chess Board neighbourhood"
+                                                    checked={neighbourhoodOption === NeighbourhoodOptions.CHESS_BOARD}
+                                                    onChange={() => setNeighbourhoodOption(NeighbourhoodOptions.CHESS_BOARD)}
+                                                />
+                                            </Row>
+                                        </Form.Group>
                                     </Row>
                                 </Accordion.Body>
                             </Accordion.Item>
@@ -733,7 +746,7 @@ const ModifyImage: React.FC = () => {
                         {altImage}
                     </Row>
                 </Col>
-            </Row>
+            </Row >
 
         </Container >
     );

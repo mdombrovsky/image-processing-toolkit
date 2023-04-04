@@ -803,3 +803,42 @@ export function doFiltering(image: PixelImage, filteringType: number, neigbourho
     }
     image.overwrite(pixels, width, height)
 }
+function addNoise(image: PixelImage, noisePercentage: number, useSalt: boolean, usePepper: boolean) {
+    const height = image.pixels.length
+    const width = image.pixels[0].length
+
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            const random = Math.random()
+
+            if (random < noisePercentage) {
+                // if first digit after decimal is even, use salt, otherwise use pepper
+                if (useSalt && usePepper) {
+                    if (Math.round(random * 10) % 2 === 0) {
+                        image.pixels[i][j].overwrite(255, 255, 255)
+                    } else {
+                        image.pixels[i][j].overwrite(0, 0, 0)
+                    }
+                } else if (useSalt) {
+                    image.pixels[i][j].overwrite(255, 255, 255)
+                } else if (usePepper) {
+                    image.pixels[i][j].overwrite(0, 0, 0)
+                }
+
+            }
+        }
+    }
+
+}
+
+export function addSaltAndPepperNoise(image: PixelImage) {
+    addNoise(image, 0.01, true, true)
+}
+
+export function addSaltNoise(image: PixelImage) {
+    addNoise(image, 0.01, true, false)
+}
+
+export function addPepperNoise(image: PixelImage) {
+    addNoise(image, 0.01, false, true)
+}
