@@ -71,7 +71,7 @@ const ModifyImage: React.FC = () => {
     const [blue, setBlue] = useState(0);
     const [validKernel, setValidKernel] = useState(true);
     const [indexingScale, setIndexingScale] = useState(1);
-    const [boundingOption, setBoundingOption] = useState(BoundingOptions.CUT_OFF)
+    const [boundingOption, setBoundingOption] = useState(BoundingOptions.NORMALIZE)
     const [neighbourhoodOption, setNeighbourhoodOption] = useState(NeighbourhoodOptions.CHESS_BOARD)
     const [neighbourhoodSize, setNeighbourhoodSize] = useState(1);
     const [kernelText, setKernelText] = useState<string>(matrixToString(defaultKernel))
