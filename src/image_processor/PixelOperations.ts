@@ -5,8 +5,8 @@ export class Pixel {
     alpha: number;
     disabled: boolean;
     constructor(red: number, green: number, blue: number, alpha: number = 255, disabled: boolean = false) {
-        if (red > 255 || green > 255 || blue > 255 || red < 0 || green < 0 || blue < 0) {
-            alert("out of range: (" + red + ", " + green + ", " + blue + ")")
+        if (red > 255 || green > 255 || blue > 255 || red < 0 || green < 0 || blue < 0 || alpha > 255 || alpha < 0) {
+            alert("out of range: (" + red + ", " + green + ", " + blue + ", " + alpha + ")")
         }
         this.red = red
         this.green = green
@@ -38,8 +38,8 @@ export class Pixel {
         }
     }
     overwrite(red: number, green: number, blue: number, alpha: number = this.alpha, disabled: boolean = false) {
-        if (red > 255 || green > 255 || blue > 255 || red < 0 || green < 0 || blue < 0) {
-            alert("out of range: (" + red + ", " + green + ", " + blue + ")")
+        if (red > 255 || green > 255 || blue > 255 || red < 0 || green < 0 || blue < 0 || alpha > 255 || alpha < 0) {
+            alert("out of range: (" + red + ", " + green + ", " + blue + ", " + alpha + ")")
         }
         this.red = red
         this.green = green
@@ -162,7 +162,7 @@ function multiplyMatrices(a: number[][], b: number[][]): number[][] {
 }
 
 
-export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType: number, r: number, g: number, b: number) {
+export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType: number, r: number, g: number, b: number, a: number = 255) {
     const pixels = pixelImage.pixels
     const radians = (degrees) * (Math.PI / 180)
     const sin = Math.sin(radians)
@@ -207,7 +207,7 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType:
             const oldJ = Math.round(oldJBad * 2) / 2.0 - 0.5
 
             if (oldI < 0 || oldJ < 0 || oldI >= pixelImage.getHeight() || oldJ >= pixelImage.getWidth()) {
-                newRow.push(new Pixel(r, g, b))
+                newRow.push(new Pixel(r, g, b, a))
 
             } else {
                 const newPixel = interpolation(pixelImage, oldI, oldJ)

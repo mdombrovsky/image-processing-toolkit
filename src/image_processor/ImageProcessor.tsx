@@ -69,6 +69,7 @@ const ModifyImage: React.FC = () => {
     const [red, setRed] = useState(155);
     const [green, setGreen] = useState(0);
     const [blue, setBlue] = useState(0);
+    const [alphaColor, setAlphaColor] = useState(255);
     const [validKernel, setValidKernel] = useState(true);
     const [indexingScale, setIndexingScale] = useState(1);
     const [boundingOption, setBoundingOption] = useState(BoundingOptions.NORMALIZE)
@@ -341,7 +342,7 @@ const ModifyImage: React.FC = () => {
                                         </Col>
                                         <Col md={4} className="m-1"
                                             style={{
-                                                backgroundColor: `rgb(${red}, ${green}, ${blue})`,
+                                                backgroundColor: `rgba(${red}, ${green}, ${blue}, ${alphaColor / 255})`,
                                             }}
                                         >
                                             <Row style={{
@@ -376,7 +377,17 @@ const ModifyImage: React.FC = () => {
                                                     tooltipLabel={(value) => `Blue: ${value}`}
                                                 />
                                             </Row>
+                                            <Row>
+                                                <RangeSlider
+                                                    value={alphaColor}
+                                                    min={0}
+                                                    max={255}
+                                                    onChange={e => { setAlphaColor(e.target.valueAsNumber) }}
+                                                    tooltipLabel={(value) => `Alpha: ${value}`}
+                                                />
+                                            </Row>
                                         </Col>
+
 
                                     </Row>
                                     <Row className="mb-2 align-items-center">
@@ -391,7 +402,9 @@ const ModifyImage: React.FC = () => {
                                                     />
                                                 </Col>
                                                 <Col>
-                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount, scaleOption, red, green, blue))}>rotate</Button>
+                                                    <Button variant="secondary" onClick={() => {
+                                                        modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount, scaleOption, red, green, blue, alphaColor))
+                                                    }}>rotate</Button>
                                                 </Col>
                                             </Row>
                                             <Row className="align-items-center">
