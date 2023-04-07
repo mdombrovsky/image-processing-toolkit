@@ -161,39 +161,18 @@ function multiplyMatrices(a: number[][], b: number[][]): number[][] {
     return result
 }
 
-
-export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType: number, r: number, g: number, b: number, a: number = 255) {
-    const pixels = pixelImage.pixels
-    const radians = (degrees) * (Math.PI / 180)
-    const sin = Math.sin(radians)
-    const cos = Math.cos(radians)
-    const oldHeight = pixelImage.getHeight()
-    const oldWidth = pixelImage.getWidth()
-    const newHeight = Math.round(Math.abs(oldHeight * cos) + Math.abs(oldWidth * sin))
-    const newWidth = Math.round(Math.abs(oldHeight * sin) + Math.abs(oldWidth * cos))
-
-    const hDiff = Math.abs(newHeight - oldHeight)
-    const wDiff = Math.abs(newWidth - oldWidth)
-
-    let interpolation: (image: PixelImage, i: number, j: number) => Pixel;
-
-    switch (scalingType) {
-        case ScaleOptions.BILINEAR:
-            interpolation = doBilinearInterpolation
-            break
-        case ScaleOptions.NEAREST:
-            interpolation = doNearestNeighbourInterpolation
-            break
-        default:
-            alert("Unsupported scaling type")
-            throw new Error("Rotation scale error")
-    }
-
+/**
+ * Does inverse matrix operation on pixelImage such as calculating roation
+ * 
+ * @param pixelImage 
+ * @param matrix This is the inverse matrix, please add xTranslation and yTranslation as oldHeight/2-0.5 and oldWidth/2-0.5 respectively
+ * @param interpolation This is the interpolation function to use
+ * @param newHeight 
+ * @param newWidth 
+ * @param defaultPixel This is when the pixel is out of bounds
+ */
+function doInverseMatrixOperation(pixelImage: PixelImage, inverseMatrix: number[][], interpolation: (image: PixelImage, i: number, j: number) => Pixel, newHeight: number, newWidth: number, defaultPixel: Pixel) {
     const newPixels: Pixel[][] = []
-
-    // Shift up and left so that center is at 0,0
-    // The -0.5 is there because each pixel is positioned at the center of the pixel (draw grid if still confused)
-    const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, oldHeight / 2.0 - 0.5, oldWidth / 2.0 - 0.5)
 
     const iIteration = newHeight / 2.0 - 0.5;
     const jIteration = newWidth / 2.0 - 0.5;
@@ -202,14 +181,12 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType:
     for (var i = -iIteration; i <= iIteration; i++) {
         const newRow: Pixel[] = []
         for (var j = -jIteration; j <= jIteration; j++) {
-            const res = multiplyMatrices(inverseRoationMatrix, [[i], [j], [1]])
+            const res = multiplyMatrices(inverseMatrix, [[i], [j], [1]])
             const [[oldI], [oldJ]] = res
 
-
-            // Move back to old center
+            // Make sure pixel is in bounds
             if (oldI < 0 || oldJ < 0 || oldI >= pixelImage.getHeight() || oldJ >= pixelImage.getWidth()) {
-                newRow.push(new Pixel(r, g, b, a))
-
+                newRow.push(defaultPixel)
             } else {
                 const newPixel = interpolation(pixelImage, oldI, oldJ)
                 newRow.push(newPixel)
@@ -218,6 +195,36 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType:
         newPixels.push(newRow)
     }
     pixelImage.overwrite(newPixels, newPixels[0].length, newPixels.length)
+}
+
+function getInterpolationFunction(scalingType: number): (image: PixelImage, i: number, j: number) => Pixel {
+    switch (scalingType) {
+        case ScaleOptions.BILINEAR:
+            return doBilinearInterpolation
+        case ScaleOptions.NEAREST:
+            return doNearestNeighbourInterpolation
+        default:
+            throw new Error(`Invalid scaling type: ${scalingType}`)
+    }
+}
+
+export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType: number, r: number, g: number, b: number, a: number = 255) {
+    const radians = (degrees) * (Math.PI / 180)
+    const sin = Math.sin(radians)
+    const cos = Math.cos(radians)
+    const oldHeight = pixelImage.getHeight()
+    const oldWidth = pixelImage.getWidth()
+    const newHeight = Math.round(Math.abs(oldHeight * cos) + Math.abs(oldWidth * sin))
+    const newWidth = Math.round(Math.abs(oldHeight * sin) + Math.abs(oldWidth * cos))
+
+
+    const newPixels: Pixel[][] = []
+
+    // Shift up and left so that center is at 0,0
+    // The -0.5 is there because each pixel is positioned at the center of the pixel (draw grid if still confused)
+    const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, oldHeight / 2.0 - 0.5, oldWidth / 2.0 - 0.5)
+
+    doInverseMatrixOperation(pixelImage, inverseRoationMatrix, getInterpolationFunction(scalingType), newHeight, newWidth, new Pixel(r, g, b, a))
 }
 
 function highlight(pixelImage: PixelImage) {
@@ -366,25 +373,14 @@ export function doIndexing(pixelImage: PixelImage, scale: number, type: number) 
 
     pixelImage.overwrite(newPixels, newPixels[0].length, newPixels.length)
 }
+
 export function scaleImage(pixelImage: PixelImage, scale: number, type: number) {
     const pixels = pixelImage.pixels
 
     const newWidth = pixelImage.getWidth() * scale
     const newHeight = pixelImage.getHeight() * scale
 
-    let interpolation: (image: PixelImage, i: number, j: number) => Pixel;
-
-    switch (type) {
-        case ScaleOptions.BILINEAR:
-            interpolation = doBilinearInterpolation
-            break
-        case ScaleOptions.NEAREST:
-            interpolation = doNearestNeighbourInterpolation
-            break
-        default:
-            alert("Unsupported scaling type")
-            throw new Error("Rotation scale error")
-    }
+    let interpolation: (image: PixelImage, i: number, j: number) => Pixel = getInterpolationFunction(type);
 
     const newPixels: Pixel[][] = []
     for (var i = 0; i < newHeight; i++) {
