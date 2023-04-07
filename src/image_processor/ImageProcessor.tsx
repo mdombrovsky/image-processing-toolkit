@@ -1,6 +1,6 @@
 import bars from '../images/bars_test_image.png'
 import React, { useState, useRef, useEffect, ReactElement } from "react";
-import { addPepperNoise, addSaltAndPepperNoise, addSaltNoise, BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doFiltering, doIndexing, doLinearMapping, doPowerLawMapping, FilteringOptions, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions, turnIntoGrayscale } from './PixelOperations'
+import { addPepperNoise, addSaltAndPepperNoise, addSaltNoise, BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doFiltering, doIndexing, doLinearMapping, doPowerLawMapping, FilteringOptions, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions, shear, turnIntoGrayscale } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Accordion, Button, Col, Container, Dropdown, DropdownButton, Form, Row } from 'react-bootstrap';
 import RangeSlider from 'react-bootstrap-range-slider';
@@ -362,7 +362,7 @@ const ModifyImage: React.FC = () => {
                                                 </Col>
                                                 <Col>
                                                     <Button variant="secondary" onClick={() => {
-                                                        // modifyImage((pixels: PixelImage) => shear(pixels, shearAlpha, shearBeta, scaleOption, red, green, blue, alphaColor))
+                                                        modifyImage((pixels: PixelImage) => shear(pixels, shearAlpha, shearBeta, scaleOption, red, green, blue, alphaColor))
                                                     }}>shear</Button>
                                                 </Col>
                                             </Row>

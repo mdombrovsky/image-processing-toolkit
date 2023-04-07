@@ -217,14 +217,34 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType:
     const newHeight = Math.round(Math.abs(oldHeight * cos) + Math.abs(oldWidth * sin))
     const newWidth = Math.round(Math.abs(oldHeight * sin) + Math.abs(oldWidth * cos))
 
-
-    const newPixels: Pixel[][] = []
-
     // Shift up and left so that center is at 0,0
     // The -0.5 is there because each pixel is positioned at the center of the pixel (draw grid if still confused)
     const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, oldHeight / 2.0 - 0.5, oldWidth / 2.0 - 0.5)
 
     doInverseMatrixOperation(pixelImage, inverseRoationMatrix, getInterpolationFunction(scalingType), newHeight, newWidth, new Pixel(r, g, b, a))
+}
+
+
+export function shear(pixelImage: PixelImage, alpha: number, beta: number, scalingType: number, r: number, g: number, b: number, a: number = 255) {
+    const oldHeight = pixelImage.getHeight()
+    const oldWidth = pixelImage.getWidth()
+    const newHeight = Math.round(oldHeight + Math.abs(oldWidth * beta))
+    const newWidth = Math.round(oldWidth + Math.abs(oldHeight * alpha))
+
+    // Shift up and left so that center is at 0,0
+    // The -0.5 is there because each pixel is positioned at the center of the pixel (draw grid if still confused)
+    const inverseShearMatrix = createInverseShearMatrix(alpha, beta, oldHeight / 2.0 - 0.5, oldWidth / 2.0 - 0.5)
+
+    doInverseMatrixOperation(pixelImage, inverseShearMatrix, getInterpolationFunction(scalingType), newHeight, newWidth, new Pixel(r, g, b, a))
+}
+
+
+function createInverseShearMatrix(alpha: number, beta: number, xTranslation: number, yTransaltion: number): number[][] {
+    return [
+        [1, beta, xTranslation],
+        [alpha, 1, yTransaltion],
+        [0, 0, 1]
+    ];
 }
 
 function highlight(pixelImage: PixelImage) {
