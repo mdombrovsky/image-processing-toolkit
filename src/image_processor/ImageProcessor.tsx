@@ -76,6 +76,8 @@ const ModifyImage: React.FC = () => {
     const [neighbourhoodOption, setNeighbourhoodOption] = useState(NeighbourhoodOptions.CHESS_BOARD)
     const [neighbourhoodSize, setNeighbourhoodSize] = useState(1);
     const [kernelText, setKernelText] = useState<string>(matrixToString(defaultKernel))
+    const [shearAlpha, setShearAlpha] = useState(0);
+    const [shearBeta, setShearBeta] = useState(0);
 
     useEffect(() => {
         const image_ = new Image();
@@ -311,79 +313,8 @@ const ModifyImage: React.FC = () => {
                                         </Form.Group>
 
                                     </Row>
-                                    <Row className="align-items-center mb-2">
-                                        <Col>
-                                            <Form.Group>
-                                                <Form.Check
-                                                    type="radio"
-                                                    name="scaleOption"
-                                                    id="bilinear"
-                                                    label="Bilinear interpolation"
-                                                    checked={scaleOption === ScaleOptions.BILINEAR}
-                                                    onChange={() => setScaleOption(ScaleOptions.BILINEAR)}
-                                                />
-                                                <Form.Check
-                                                    type="radio"
-                                                    name="scaleOption"
-                                                    id="nearest"
-                                                    label="Nearest neighbour interpolation"
-                                                    checked={scaleOption === ScaleOptions.NEAREST}
-                                                    onChange={() => setScaleOption(ScaleOptions.NEAREST)}
-                                                />
-                                            </Form.Group>
-                                        </Col>
-                                        <Col md={4} className="m-1"
-                                            style={{
-                                                backgroundColor: `rgba(${red}, ${green}, ${blue}, ${alphaColor / 255})`,
-                                            }}
-                                        >
-                                            <Row style={{
-                                                backgroundColor: `rgb(255,255,255)`,
-                                            }}>
-                                                <Form.Label>Padding Colour</Form.Label>
-                                            </Row>
-                                            <Row>
-                                                <RangeSlider
-                                                    value={red}
-                                                    min={0}
-                                                    max={255}
-                                                    onChange={e => { setRed(e.target.valueAsNumber) }}
-                                                    tooltipLabel={(value) => `Red: ${value}`}
-                                                />
-                                            </Row>
-                                            <Row>
-                                                <RangeSlider
-                                                    value={green}
-                                                    min={0}
-                                                    max={255}
-                                                    onChange={e => { setGreen(e.target.valueAsNumber) }}
-                                                    tooltipLabel={(value) => `Green: ${value}`}
-                                                />
-                                            </Row>
-                                            <Row>
-                                                <RangeSlider
-                                                    value={blue}
-                                                    min={0}
-                                                    max={255}
-                                                    onChange={e => { setBlue(e.target.valueAsNumber) }}
-                                                    tooltipLabel={(value) => `Blue: ${value}`}
-                                                />
-                                            </Row>
-                                            <Row>
-                                                <RangeSlider
-                                                    value={alphaColor}
-                                                    min={0}
-                                                    max={255}
-                                                    onChange={e => { setAlphaColor(e.target.valueAsNumber) }}
-                                                    tooltipLabel={(value) => `Alpha: ${value}`}
-                                                />
-                                            </Row>
-                                        </Col>
-
-
-                                    </Row>
-                                    <Row className="mb-2 align-items-center">
-                                        <Col className="align-items-center">
+                                    <Row>
+                                        <Col className="align-items-center" md={6} >
                                             <Row className="align-items-center">
                                                 <Col>
                                                     <Form.Label>Rotate amount:</Form.Label>
@@ -412,7 +343,103 @@ const ModifyImage: React.FC = () => {
 
                                                 </Col>
                                             </Row>
+                                            <Row className="align-items-center">
+                                                <Col>
+                                                    <Row>
+                                                        <Form.Label>Alpha:</Form.Label>
+                                                        <Form.Control
+                                                            type="number"
+                                                            defaultValue={shearAlpha} min={0.10} max={10} step={0.01} onChange={e => setShearAlpha(Number(e.target.value))}
+                                                        />
+                                                    </Row>
+                                                    <Row>
+                                                        <Form.Label>Beta:</Form.Label>
+                                                        <Form.Control
+                                                            type="number"
+                                                            defaultValue={shearBeta} min={0.10} max={10} step={0.01} onChange={e => setShearBeta(Number(e.target.value))}
+                                                        />
+                                                    </Row>
+                                                </Col>
+                                                <Col>
+                                                    <Button variant="secondary" onClick={() => {
+                                                        // modifyImage((pixels: PixelImage) => shear(pixels, shearAlpha, shearBeta, scaleOption, red, green, blue, alphaColor))
+                                                    }}>shear</Button>
+                                                </Col>
+                                            </Row>
                                         </Col>
+                                        <Col className="align-items-center mb-2">
+                                            <Container className="m-1"
+                                                style={{
+                                                    backgroundColor: `rgba(${red}, ${green}, ${blue}, ${alphaColor / 255})`,
+                                                }}
+                                            >
+                                                <Row style={{
+                                                    backgroundColor: `rgb(255,255,255)`,
+                                                }}>
+                                                    <Form.Label>Padding Colour</Form.Label>
+                                                </Row>
+                                                <Row>
+                                                    <RangeSlider
+                                                        value={red}
+                                                        min={0}
+                                                        max={255}
+                                                        onChange={e => { setRed(e.target.valueAsNumber) }}
+                                                        tooltipLabel={(value) => `Red: ${value}`}
+                                                    />
+                                                </Row>
+                                                <Row>
+                                                    <RangeSlider
+                                                        value={green}
+                                                        min={0}
+                                                        max={255}
+                                                        onChange={e => { setGreen(e.target.valueAsNumber) }}
+                                                        tooltipLabel={(value) => `Green: ${value}`}
+                                                    />
+                                                </Row>
+                                                <Row>
+                                                    <RangeSlider
+                                                        value={blue}
+                                                        min={0}
+                                                        max={255}
+                                                        onChange={e => { setBlue(e.target.valueAsNumber) }}
+                                                        tooltipLabel={(value) => `Blue: ${value}`}
+                                                    />
+                                                </Row>
+                                                <Row>
+                                                    <RangeSlider
+                                                        value={alphaColor}
+                                                        min={0}
+                                                        max={255}
+                                                        onChange={e => { setAlphaColor(e.target.valueAsNumber) }}
+                                                        tooltipLabel={(value) => `Alpha: ${value}`}
+                                                    />
+                                                </Row>
+                                            </Container>
+                                            <Container>
+                                                <Form.Group>
+                                                    <Form.Check
+                                                        type="radio"
+                                                        name="scaleOption"
+                                                        id="bilinear"
+                                                        label="Bilinear interpolation"
+                                                        checked={scaleOption === ScaleOptions.BILINEAR}
+                                                        onChange={() => setScaleOption(ScaleOptions.BILINEAR)}
+                                                    />
+                                                    <Form.Check
+                                                        type="radio"
+                                                        name="scaleOption"
+                                                        id="nearest"
+                                                        label="Nearest neighbour interpolation"
+                                                        checked={scaleOption === ScaleOptions.NEAREST}
+                                                        onChange={() => setScaleOption(ScaleOptions.NEAREST)}
+                                                    />
+                                                </Form.Group>
+                                            </Container>
+                                        </Col>
+
+                                    </Row>
+                                    <Row className="mb-2 align-items-center">
+
 
                                         <Col className="align-items-center">
                                             <Row className="m-1">
