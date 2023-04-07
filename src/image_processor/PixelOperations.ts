@@ -263,9 +263,8 @@ function boundNumber(input: number, min: number, max: number): number {
 }
 
 export const ScaleOptions = {
-    BICUBIC: 0,
-    BILINEAR: 1,
-    NEAREST: 2,
+    BILINEAR: 0,
+    NEAREST: 1,
 }
 
 export const IndexingOptions = {

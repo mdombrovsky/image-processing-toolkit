@@ -317,14 +317,6 @@ const ModifyImage: React.FC = () => {
                                                 <Form.Check
                                                     type="radio"
                                                     name="scaleOption"
-                                                    id="bicubic"
-                                                    label="Bicubic interpolation"
-                                                    checked={scaleOption === ScaleOptions.BICUBIC}
-                                                    onChange={() => setScaleOption(ScaleOptions.BICUBIC)}
-                                                />
-                                                <Form.Check
-                                                    type="radio"
-                                                    name="scaleOption"
                                                     id="bilinear"
                                                     label="Bilinear interpolation"
                                                     checked={scaleOption === ScaleOptions.BILINEAR}
