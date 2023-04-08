@@ -326,6 +326,19 @@ const ModifyImage: React.FC = () => {
                                         <Col className="align-items-center" md={6} >
                                             <Row className="align-items-center mb-2">
                                                 <Col>
+                                                    <Form.Label>Scale:</Form.Label>
+                                                    <Form.Control
+                                                        type="number"
+                                                        defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => { setValueIfNonNegative(e, setScale) }}
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</Button>
+
+                                                </Col>
+                                            </Row>
+                                            <Row className="align-items-center mb-2">
+                                                <Col>
                                                     <Form.Label>Rotate amount:</Form.Label>
                                                     <Form.Control
                                                         type="number"
@@ -337,19 +350,6 @@ const ModifyImage: React.FC = () => {
                                                     <Button variant="secondary" onClick={() => {
                                                         modifyImage((pixels: PixelImage) => rotate(pixels, rotateAmount, scaleOption, red, green, blue, alphaColor))
                                                     }}>rotate</Button>
-                                                </Col>
-                                            </Row>
-                                            <Row className="align-items-center mb-2">
-                                                <Col>
-                                                    <Form.Label>Scale:</Form.Label>
-                                                    <Form.Control
-                                                        type="number"
-                                                        defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => { setValueIfNonNegative(e, setScale) }}
-                                                    />
-                                                </Col>
-                                                <Col>
-                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => scaleImage(pixels, scale, scaleOption))}>scale</Button>
-
                                                 </Col>
                                             </Row>
                                             <Row className="align-items-center mb-2">
