@@ -366,6 +366,9 @@ function doNearestNeighbourInterpolation(pixelImage: PixelImage, i: number, j: n
 }
 
 export function doIndexing(pixelImage: PixelImage, scale: number, type: number) {
+    if (scale < 1) {
+        return
+    }
     let doIndexing: (pixels: Pixel[][], i: number, j: number) => Pixel;
     switch (type) {
         case IndexingOptions.REFLECTIVE:

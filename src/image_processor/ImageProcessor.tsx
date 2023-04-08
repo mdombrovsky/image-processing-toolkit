@@ -1,5 +1,5 @@
 import bars from '../images/bars_test_image.png'
-import React, { useState, useRef, useEffect, ReactElement } from "react";
+import React, { useState, useRef, useEffect, ReactElement, ChangeEvent } from "react";
 import { addPepperNoise, addSaltAndPepperNoise, addSaltNoise, BoundingOptions, createFrequencyHistogram as createFrequencyHistogram, createNormalizedCumulativeHistogram, crop, doFiltering, doIndexing, doLinearMapping, doPowerLawMapping, FilteringOptions, flipHorizontally, flipVertically, gaussianBlur, Histogram, histogramEqualization, IndexingOptions, invertPixels, NeighbourhoodOptions, performConvolution, Pixel, PixelImage, rotate, scaleImage, ScaleOptions, shear, turnIntoGrayscale } from './PixelOperations'
 import Plot from 'react-plotly.js';
 import { Accordion, Button, Col, Container, Dropdown, DropdownButton, Form, Row } from 'react-bootstrap';
@@ -230,7 +230,16 @@ const ModifyImage: React.FC = () => {
         }
     }
 
-
+    function setValueIfNonNegative(e: ChangeEvent<any>, setter: (value: number) => void) {
+        const val = Number(e.target.value)
+        if (val >= 0) {
+            setter(val)
+        } else {
+            const absVal = Math.abs(val)
+            e.target.value = absVal.toString()
+            setter(absVal)
+        }
+    }
 
     function matrixToString(matrix: number[][]): string {
         return matrix.map(row => row.join(" ")).join("\n");
@@ -335,7 +344,7 @@ const ModifyImage: React.FC = () => {
                                                     <Form.Label>Scale:</Form.Label>
                                                     <Form.Control
                                                         type="number"
-                                                        defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setScale(Number(e.target.value))}
+                                                        defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => { setValueIfNonNegative(e, setScale) }}
                                                     />
                                                 </Col>
                                                 <Col>
@@ -349,14 +358,14 @@ const ModifyImage: React.FC = () => {
                                                         <Form.Label>Alpha:</Form.Label>
                                                         <Form.Control
                                                             type="number"
-                                                            defaultValue={shearAlpha} min={0.10} max={10} step={0.01} onChange={e => setShearAlpha(Number(e.target.value))}
+                                                            defaultValue={shearAlpha} min={0.10} max={10} step={0.01} onChange={e => { setValueIfNonNegative(e, setShearAlpha) }}
                                                         />
                                                     </Row>
                                                     <Row>
                                                         <Form.Label>Beta:</Form.Label>
                                                         <Form.Control
                                                             type="number"
-                                                            defaultValue={shearBeta} min={0.10} max={10} step={0.01} onChange={e => setShearBeta(Number(e.target.value))}
+                                                            defaultValue={shearBeta} min={0.10} max={10} step={0.01} onChange={e => { setValueIfNonNegative(e, setShearBeta) }}
                                                         />
                                                     </Row>
                                                 </Col>
