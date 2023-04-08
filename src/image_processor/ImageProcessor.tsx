@@ -545,12 +545,14 @@ const ModifyImage: React.FC = () => {
                                                 </Form.Group>
                                             </Form>
                                         </Col>
-                                        <Col lg={4} className="align-items-center mb-2">
+                                        <Col xl={5} lg={12} className="align-items-center mb-2">
                                             <Row className="mb-1">
                                                 <Button variant="secondary" disabled={!validKernel} onClick={() => modifyImage((pixels: PixelImage) => performConvolution(pixels, kernel, indexingOption, boundingOption))}>Perform Convolution</Button>
                                             </Row>
                                             <Row className="">
-                                                <DropdownButton style={{ width: '100%' }} id="built-in-kernels" title="Built in Kernels">
+                                                <DropdownButton style={{
+                                                    padding: 0,
+                                                }} id="built-in-kernels" title="Built in Kernels">
                                                     <Dropdown.Item onClick={() => setKernelFromString(
                                                         " 1\t 2\t 1\n" +
                                                         " 0\t 0\t 0\n" +
@@ -659,7 +661,7 @@ const ModifyImage: React.FC = () => {
                                                     />
                                                 </Col>
                                                 <Col>
-                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => doIndexing(pixels, indexingScale, indexingOption))}>Scale via Indexing</Button>
+                                                    <Button variant="secondary" onClick={() => modifyImage((pixels: PixelImage) => doIndexing(pixels, indexingScale, indexingOption))}>Increase size via Indexing</Button>
 
                                                 </Col>
                                             </Row>
