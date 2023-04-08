@@ -118,14 +118,6 @@ export function flipVertically(pixelImage: PixelImage) {
     }
 }
 
-function createRotationMatrix(degrees: number): number[][] {
-    const radians = degrees * (Math.PI / 180)
-    return [
-        [Math.cos(radians), -Math.sin(radians)],
-        [Math.sin(radians), Math.cos(radians)],
-    ];
-}
-
 function createInverseRotationTranslationMatrix(radians: number, xTranslation: number, yTransaltion: number): number[][] {
     return [
         [Math.cos(radians), Math.sin(radians), xTranslation],
@@ -181,8 +173,7 @@ function doInverseMatrixOperation(pixelImage: PixelImage, inverseMatrix: number[
     for (var i = -iIteration; i <= iIteration; i++) {
         const newRow: Pixel[] = []
         for (var j = -jIteration; j <= jIteration; j++) {
-            const res = multiplyMatrices(inverseMatrix, [[i], [j], [1]])
-            const [[oldI], [oldJ]] = res
+            const [[oldI], [oldJ]] = multiplyMatrices(inverseMatrix, [[i], [j], [1]])
 
             // Make sure pixel is in bounds
             if (oldI < 0 || oldJ < 0 || oldI >= pixelImage.getHeight() || oldJ >= pixelImage.getWidth()) {
@@ -242,7 +233,6 @@ export function shear(pixelImage: PixelImage, alpha: number, beta: number, scali
     const inverseShearMatrix = createInverseShearMatrix(alpha, beta, oldHeight / 2.0 - 0.5, oldWidth / 2.0 - 0.5)
 
     doInverseMatrixOperation(pixelImage, inverseShearMatrix, getInterpolationFunction(scalingType), newNewHeight, newNewWidth, new Pixel(r, g, b, a))
-
 }
 
 
