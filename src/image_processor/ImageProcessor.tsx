@@ -324,7 +324,7 @@ const ModifyImage: React.FC = () => {
                                     </Row>
                                     <Row>
                                         <Col className="align-items-center" md={6} >
-                                            <Row className="align-items-center">
+                                            <Row className="align-items-center mb-2">
                                                 <Col>
                                                     <Form.Label>Rotate amount:</Form.Label>
                                                     <Form.Control
@@ -339,7 +339,7 @@ const ModifyImage: React.FC = () => {
                                                     }}>rotate</Button>
                                                 </Col>
                                             </Row>
-                                            <Row className="align-items-center">
+                                            <Row className="align-items-center mb-2">
                                                 <Col>
                                                     <Form.Label>Scale:</Form.Label>
                                                     <Form.Control
@@ -352,9 +352,9 @@ const ModifyImage: React.FC = () => {
 
                                                 </Col>
                                             </Row>
-                                            <Row className="align-items-center">
+                                            <Row className="align-items-center mb-2">
                                                 <Col>
-                                                    <Row>
+                                                    <Row className="mb-1">
                                                         <Form.Label>Alpha:</Form.Label>
                                                         <Form.Control
                                                             type="number"
@@ -452,24 +452,23 @@ const ModifyImage: React.FC = () => {
 
                                         <Col className="align-items-center">
                                             <Row className="m-1">
-                                                <Button variant="secondary" onClick={() => modifyImage(invertPixels)}>Invert Pixels</Button>
-
+                                                <Button variant="secondary" onClick={() => modifyImage(flipVertically)}>Flip vertically</Button>
                                             </Row>
                                             <Row className="m-1">
                                                 <Button variant="secondary" onClick={() => modifyImage(flipHorizontally)}>Flip horizontally</Button>
 
                                             </Row>
+                                        </Col>
+                                        <Col className="align-items-center">
                                             <Row className="m-1">
-                                                <Button variant="secondary" onClick={() => modifyImage(flipVertically)}>Flip vertically</Button>
+                                                <Button variant="secondary" onClick={() => modifyImage(invertPixels)}>Invert Pixels</Button>
+
                                             </Row>
                                             <Row className="m-1">
                                                 <Button variant="warning" onClick={() => modifyImage(turnIntoGrayscale)}>Make Grayscale</Button>
                                             </Row>
                                         </Col>
-
-
                                     </Row>
-
                                 </Accordion.Body>
                             </Accordion.Item>
                             <Accordion.Item eventKey='mappings'>
@@ -653,7 +652,7 @@ const ModifyImage: React.FC = () => {
                                         <Form.Group>
                                             <Row className="align-items-center">
                                                 <Col>
-                                                    <Form.Label>Scale Via Indexing:</Form.Label>
+                                                    <Form.Label>Scale Up Via Indexing:</Form.Label>
                                                     <Form.Control
                                                         type="number"
                                                         defaultValue={1} min={0.10} max={10} step={0.01} onChange={e => setIndexingScale(Number(e.target.value))}
