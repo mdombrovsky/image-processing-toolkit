@@ -675,14 +675,14 @@ const ModifyImage: React.FC = () => {
                                 </Accordion.Header>
                                 <Accordion.Body>
                                     <Row className="align-items-center">
-                                        <Col>
-                                            <Button variant="secondary" onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</Button>
+                                        <Col lg={12} xl={4}>
+                                            <Button variant="secondary" className="my-1" onClick={() => modifyImage(histogramEqualization)}>Perform histogram equalization</Button>
                                         </Col>
-                                        <Col>
-                                            <Button variant="info" onClick={() => modifyImage(plotFrequencyHistogram)}>Compute frequency histogram</Button>
+                                        <Col lg={12} xl={4}>
+                                            <Button variant="info" className="my-1" onClick={() => modifyImage(plotFrequencyHistogram)}>Compute frequency histogram</Button>
                                         </Col>
-                                        <Col>
-                                            <Button variant="info" onClick={() => modifyImage(plotCumulativeNormalizedHistogram)}>Compute cumulative normalized histogram</Button>
+                                        <Col lg={12} xl={4}>
+                                            <Button variant="info" className="my-1" onClick={() => modifyImage(plotCumulativeNormalizedHistogram)}>Compute cumulative normalized histogram</Button>
                                         </Col>
                                     </Row>
                                 </Accordion.Body>
