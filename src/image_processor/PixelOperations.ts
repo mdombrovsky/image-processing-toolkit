@@ -661,7 +661,7 @@ export function doLinearMapping(image: PixelImage, alpha: number, beta: number) 
 export function doPowerLawMapping(image: PixelImage, gamma: number) {
     const maxPixelValue = 255
     doSinglePixelOperation(image, (pixelValue: number) => {
-        return boundNumber(Math.round(maxPixelValue * ((pixelValue * 1.00 / maxPixelValue) ** gamma)), 0, maxPixelValue)
+        return boundNumber(Math.round(maxPixelValue - 1) * ((pixelValue * 1.00 / (maxPixelValue - 1.00)) ** gamma), 0, maxPixelValue)
     })
 }
 

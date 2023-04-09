@@ -518,7 +518,7 @@ const ModifyImage: React.FC = () => {
                                         <Col>
                                             <Row className="">
                                                 <Button variant="secondary" onClick={() => modifyImage((image: PixelImage) => doPowerLawMapping(image, gamma))}>
-                                                    Power law mapping <br /> m(u)=(L-)[u/(L-1)]^γ
+                                                    Power law mapping <br /> m(u)=(L-1)[u/(L-1)]^γ
                                                 </Button>
                                             </Row>
 
