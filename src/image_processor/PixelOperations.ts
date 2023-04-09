@@ -221,18 +221,14 @@ export function shear(pixelImage: PixelImage, alpha: number, beta: number, scali
     const oldHeight = pixelImage.getHeight()
     const oldWidth = pixelImage.getWidth()
 
-    // Do iteration in case of alpha and beta being non zero
     const newHeight = Math.round(oldHeight + Math.abs(oldWidth * beta))
-    const newWidth = Math.round(oldWidth + Math.abs(oldHeight * alpha * 0))
-
-    const newNewHeight = Math.round(newHeight + Math.abs(newWidth * beta * 0))
-    const newNewWidth = Math.round(newWidth + Math.abs(newHeight * alpha))
+    const newWidth = Math.round(oldWidth + Math.abs(newHeight * alpha))
 
     // Shift up and left so that center is at 0,0
     // The -0.5 is there because each pixel is positioned at the center of the pixel (draw grid if still confused)
     const inverseShearMatrix = createInverseShearMatrix(alpha, beta, oldHeight / 2.0 - 0.5, oldWidth / 2.0 - 0.5)
 
-    doInverseMatrixOperation(pixelImage, inverseShearMatrix, getInterpolationFunction(scalingType), newNewHeight, newNewWidth, new Pixel(r, g, b, a))
+    doInverseMatrixOperation(pixelImage, inverseShearMatrix, getInterpolationFunction(scalingType), newHeight, newWidth, new Pixel(r, g, b, a))
 }
 
 
