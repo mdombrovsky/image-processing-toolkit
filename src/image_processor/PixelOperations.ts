@@ -624,19 +624,19 @@ export function createNormalizedCumulativeHistogram(image: PixelImage): Histogra
 export function histogramEqualization(image: PixelImage) {
     const height = image.pixels.length
     const width = image.pixels[0].length
-    const pixelValues = 256
+    const pixelValueRange = 256
 
     // create normalized cumulative histogram 
     const cnh = createNormalizedCumulativeHistogram(image)
 
     // create transition functions
-    const redTransition: number[] = new Array(pixelValues).fill(0)
-    const greenTransition: number[] = new Array(pixelValues).fill(0)
-    const blueTransition: number[] = new Array(pixelValues).fill(0)
-    for (let i = 0; i < pixelValues; i++) {
-        redTransition[i] = Math.round(cnh.redHistogram[i] * (pixelValues - 1))
-        greenTransition[i] = Math.round(cnh.greenHistogram[i] * (pixelValues - 1))
-        blueTransition[i] = Math.round(cnh.blueHistogram[i] * (pixelValues - 1))
+    const redTransition: number[] = new Array(pixelValueRange).fill(0)
+    const greenTransition: number[] = new Array(pixelValueRange).fill(0)
+    const blueTransition: number[] = new Array(pixelValueRange).fill(0)
+    for (let i = 0; i < pixelValueRange; i++) {
+        redTransition[i] = Math.round(cnh.redHistogram[i] * (pixelValueRange - 1))
+        greenTransition[i] = Math.round(cnh.greenHistogram[i] * (pixelValueRange - 1))
+        blueTransition[i] = Math.round(cnh.blueHistogram[i] * (pixelValueRange - 1))
     }
 
 
