@@ -154,7 +154,7 @@ function multiplyMatrices(a: number[][], b: number[][]): number[][] {
 }
 
 /**
- * Does inverse matrix operation on pixelImage such as calculating roation
+ * Does inverse matrix operation on pixelImage such as calculating rotation
  * 
  * @param pixelImage 
  * @param matrix This is the inverse matrix, please add xTranslation and yTranslation as oldHeight/2-0.5 and oldWidth/2-0.5 respectively
@@ -210,9 +210,9 @@ export function rotate(pixelImage: PixelImage, degrees: number = 3, scalingType:
 
     // Shift up and left so that center is at 0,0
     // The -0.5 is there because each pixel is positioned at the center of the pixel (draw grid if still confused)
-    const inverseRoationMatrix = createInverseRotationTranslationMatrix(radians, oldHeight / 2.0 - 0.5, oldWidth / 2.0 - 0.5)
+    const inverseRotationMatrix = createInverseRotationTranslationMatrix(radians, oldHeight / 2.0 - 0.5, oldWidth / 2.0 - 0.5)
 
-    doInverseMatrixOperation(pixelImage, inverseRoationMatrix, getInterpolationFunction(scalingType), newHeight, newWidth, new Pixel(r, g, b, a))
+    doInverseMatrixOperation(pixelImage, inverseRotationMatrix, getInterpolationFunction(scalingType), newHeight, newWidth, new Pixel(r, g, b, a))
 }
 
 
