@@ -770,8 +770,6 @@ function getMedianOfNeighbourhood(neighbourhood: Pixel[]): Pixel {
 }
 
 export function doFiltering(image: PixelImage, filteringType: number, neigbourhoodType: number, neighbourHoodSize: number) {
-    console.log(filteringType, neigbourhoodType, neighbourHoodSize)
-
     let doFiltering: (neighbourhood: Pixel[]) => Pixel
 
     let getNeighbourhood: (image: PixelImage, x: number, y: number, size: number) => Pixel[]
