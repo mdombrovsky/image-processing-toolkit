@@ -827,7 +827,7 @@ function addNoise(image: PixelImage, noisePercentage: number, useSalt: boolean, 
             if (random < noisePercentage) {
                 // if first digit after decimal is even, use salt, otherwise use pepper
                 if (useSalt && usePepper) {
-                    if (Math.round(random * 10) % 2 === 0) {
+                    if (Math.round(random * 10000000) % 2 === 0) {
                         image.pixels[i][j].overwrite(255, 255, 255)
                     } else {
                         image.pixels[i][j].overwrite(0, 0, 0)
